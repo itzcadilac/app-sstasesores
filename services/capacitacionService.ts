@@ -2,6 +2,19 @@ import { SolicitudCapacitacion, Capacitado, Capacitacion, CapacitacionDetalle } 
 
 const API_BASE_URL = 'https://software.sstasesores.pe/api';
 
+interface EstadisticasEmpresa {
+  cantidadSolicitudes: number;
+  capacitados: number;
+}
+
+interface CapacitadoResult {
+  documento: string;
+  capacitado: string;
+  capacitacion: string;
+  fecha: string;
+  nota: string;
+}
+
 export async function crearSolicitud(solicitud: SolicitudCapacitacion, token: string): Promise<SolicitudCapacitacion> {
   try {
     const response = await fetch(`${API_BASE_URL}/solicitudes`, {
@@ -94,6 +107,44 @@ export async function obtenerSolicitudesEmpresa(empresaId: string, token: string
     return await response.json();
   } catch (error) {
     console.error('Get solicitudes error:', error);
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error('Error de conexión');
+  }
+}
+
+export async function obtenerEstadisticasEmpresa(ruc: string): Promise<EstadisticasEmpresa> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/estadisticas.php?ruc=${ruc}`);
+
+    if (!response.ok) {
+      throw new Error('Error al obtener estadísticas');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Get estadisticas error:', error);
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error('Error de conexión');
+  }
+}
+
+export async function buscarCapacitadosPorDocumento(ruc: string, documento: string): Promise<CapacitadoResult[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/buscar_capacitados.php?ruc=${ruc}&documento=${documento}`);
+
+    if (!response.ok) {
+      throw new Error('Error al buscar capacitados');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Buscar capacitados error:', error);
     if (error instanceof Error) {
       throw error;
     }

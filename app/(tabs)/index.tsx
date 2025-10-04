@@ -1,15 +1,45 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { Building2, User, FileText, TrendingUp, Clock, CheckCircle } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
 import Colors from '@/constants/Colors';
+import { obtenerEstadisticasEmpresa } from '@/services/capacitacionService';
 
 const fontWeight700 = '700' as const;
 const fontWeight600 = '600' as const;
 
+interface EstadisticasEmpresa {
+  cantidadSolicitudes: number;
+  capacitados: number;
+}
+
 export default function HomeScreen() {
   const { user, isEmpresa } = useAuth();
+  const router = useRouter();
+  const [estadisticas, setEstadisticas] = useState<EstadisticasEmpresa>({ cantidadSolicitudes: 0, capacitados: 0 });
+  const [isLoadingStats, setIsLoadingStats] = useState(false);
+
+  useEffect(() => {
+    if (isEmpresa && user?.ruc) {
+      loadEstadisticas();
+    }
+  }, [isEmpresa, user?.ruc]);
+
+  const loadEstadisticas = async () => {
+    if (!user?.ruc) return;
+    
+    try {
+      setIsLoadingStats(true);
+      const stats = await obtenerEstadisticasEmpresa(user.ruc);
+      setEstadisticas(stats);
+    } catch (error) {
+      console.error('Error loading estadisticas:', error);
+    } finally {
+      setIsLoadingStats(false);
+    }
+  };
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -25,8 +55,8 @@ export default function HomeScreen() {
           )}
           <Text style={styles.welcomeText}>Bienvenido</Text>
           <Text style={styles.userName}>{user?.nombre}</Text>
-          {isEmpresa && user?.empresa && (
-            <Text style={styles.companyName}>{user.empresa}</Text>
+          {isEmpresa && user?.ruc && (
+            <Text style={styles.rucText}>RUC: {user.ruc}</Text>
           )}
         </View>
       </LinearGradient>
@@ -38,24 +68,24 @@ export default function HomeScreen() {
               <View style={[styles.statIcon, { backgroundColor: Colors.primary + '20' }]}>
                 <FileText size={24} color={Colors.primary} />
               </View>
-              <Text style={styles.statValue}>0</Text>
-              <Text style={styles.statLabel}>Solicitudes Activas</Text>
+              {isLoadingStats ? (
+                <ActivityIndicator size="small" color={Colors.primary} />
+              ) : (
+                <Text style={styles.statValue}>{estadisticas.cantidadSolicitudes}</Text>
+              )}
+              <Text style={styles.statLabel}>Cantidad de Solicitudes</Text>
             </View>
 
             <View style={styles.statCard}>
               <View style={[styles.statIcon, { backgroundColor: Colors.secondary + '20' }]}>
                 <TrendingUp size={24} color={Colors.secondary} />
               </View>
-              <Text style={styles.statValue}>0</Text>
+              {isLoadingStats ? (
+                <ActivityIndicator size="small" color={Colors.secondary} />
+              ) : (
+                <Text style={styles.statValue}>{estadisticas.capacitados}</Text>
+              )}
               <Text style={styles.statLabel}>Capacitados</Text>
-            </View>
-
-            <View style={styles.statCard}>
-              <View style={[styles.statIcon, { backgroundColor: Colors.success + '20' }]}>
-                <CheckCircle size={24} color={Colors.success} />
-              </View>
-              <Text style={styles.statValue}>0</Text>
-              <Text style={styles.statLabel}>Completadas</Text>
             </View>
           </>
         ) : (
@@ -92,7 +122,7 @@ export default function HomeScreen() {
         
         {isEmpresa ? (
           <View style={styles.quickActions}>
-            <TouchableOpacity style={styles.actionCard}>
+            <TouchableOpacity style={styles.actionCard} onPress={() => router.push('/(tabs)/solicitud')}>
               <LinearGradient
                 colors={[Colors.primary, Colors.primaryDark]}
                 style={styles.actionGradient}
@@ -102,7 +132,7 @@ export default function HomeScreen() {
               </LinearGradient>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.actionCard}>
+            <TouchableOpacity style={styles.actionCard} onPress={() => router.push('/(tabs)/buscar')}>
               <LinearGradient
                 colors={[Colors.secondary, Colors.secondaryDark]}
                 style={styles.actionGradient}
@@ -167,11 +197,11 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     marginTop: 4,
   },
-  companyName: {
-    fontSize: 16,
+  rucText: {
+    fontSize: 14,
     color: '#FFFFFF',
     marginTop: 4,
-    opacity: 0.9,
+    opacity: 0.85,
   },
   statsContainer: {
     flexDirection: 'row',
