@@ -42,7 +42,8 @@ export async function login(credentials: LoginCredentials): Promise<User> {
     }
 
     const data = await response.json();
-    console.log('Login successful');
+    console.log('Login successful - Full response:', JSON.stringify(data, null, 2));
+    console.log('User data being returned:', JSON.stringify(data.user, null, 2));
     return data.user;
   } catch (error) {
     console.error('Login error:', error);
