@@ -38,11 +38,11 @@ export default function HomeScreen() {
   }, [user?.ruc, user?.token]);
 
   useEffect(() => {
-    console.log('useEffect ejecutado - isEmpresa:', isEmpresa, 'user?.ruc:', user?.ruc);
+    console.log('useEffect ejecutado - isEmpresa:', isEmpresa, 'user?.ruc:', user?.ruc, 'user?.token:', user?.token ? 'presente' : 'ausente');
     if (isEmpresa && user?.ruc && user?.token) {
       loadEstadisticas();
     }
-  }, [isEmpresa, user?.ruc, user?.token, loadEstadisticas]);
+  }, [isEmpresa, user?.ruc, user?.token]);
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
