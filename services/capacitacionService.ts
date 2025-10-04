@@ -21,7 +21,7 @@ export async function crearSolicitud(solicitud: SolicitudCapacitacion, token: st
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        'x-auth-token': token,
       },
       body: JSON.stringify(solicitud),
     });
@@ -56,7 +56,7 @@ export async function buscarCapacitados(empresaId: string, filtros: {
 
     const response = await fetch(`${API_BASE_URL}/capacitados?${params}`, {
       headers: {
-        'Authorization': `Bearer ${token}`,
+        'x-auth-token': token,
       },
     });
 
@@ -96,7 +96,7 @@ export async function obtenerSolicitudesEmpresa(empresaId: string, token: string
   try {
     const response = await fetch(`${API_BASE_URL}/solicitudes/empresa/${empresaId}`, {
       headers: {
-        'Authorization': `Bearer ${token}`,
+        'x-auth-token': token,
       },
     });
 
@@ -123,7 +123,7 @@ export async function obtenerEstadisticasEmpresa(ruc: string, token: string): Pr
     
     const response = await fetch(url, {
       headers: {
-        'Authorization': `Bearer ${token}`,
+        'x-auth-token': token,
       },
     });
     
@@ -160,7 +160,7 @@ export async function buscarCapacitadosPorDocumento(ruc: string, documento: stri
     
     const response = await fetch(url, {
       headers: {
-        'Authorization': `Bearer ${token}`,
+        'x-auth-token': token,
       },
     });
     
