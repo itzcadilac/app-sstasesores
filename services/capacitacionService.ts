@@ -119,15 +119,19 @@ export async function obtenerEstadisticasEmpresa(ruc: string, token: string): Pr
     const url = `${API_BASE_URL}/estadisticas.php?ruc=${ruc}`;
     console.log('Obteniendo estadísticas - URL:', url);
     console.log('Obteniendo estadísticas - RUC:', ruc);
+    console.log('Obteniendo estadísticas - Token:', token ? `${token.substring(0, 20)}...` : 'NO TOKEN');
     
     const response = await fetch(url, {
       headers: {
         'Authorization': `Bearer ${token}`,
+        'X-Auth-Token': token,
+        'Content-Type': 'application/json',
       },
     });
     
     console.log('Estadísticas Response status:', response.status);
     console.log('Estadísticas Response ok:', response.ok);
+    console.log('Estadísticas Response headers:', JSON.stringify(Object.fromEntries(response.headers.entries())));
     
     const responseText = await response.text();
     console.log('Estadísticas Response text:', responseText);
@@ -154,10 +158,13 @@ export async function buscarCapacitadosPorDocumento(ruc: string, documento: stri
     console.log('Buscando capacitados - URL:', url);
     console.log('Buscando capacitados - RUC:', ruc);
     console.log('Buscando capacitados - Documento:', documento);
+    console.log('Buscando capacitados - Token:', token ? `${token.substring(0, 20)}...` : 'NO TOKEN');
     
     const response = await fetch(url, {
       headers: {
         'Authorization': `Bearer ${token}`,
+        'X-Auth-Token': token,
+        'Content-Type': 'application/json',
       },
     });
     
