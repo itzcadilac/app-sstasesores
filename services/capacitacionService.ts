@@ -116,13 +116,24 @@ export async function obtenerSolicitudesEmpresa(empresaId: string, token: string
 
 export async function obtenerEstadisticasEmpresa(ruc: string): Promise<EstadisticasEmpresa> {
   try {
-    const response = await fetch(`${API_BASE_URL}/estadisticas.php?ruc=${ruc}`);
+    const url = `${API_BASE_URL}/estadisticas.php?ruc=${ruc}`;
+    console.log('Obteniendo estadísticas - URL:', url);
+    console.log('Obteniendo estadísticas - RUC:', ruc);
+    
+    const response = await fetch(url);
+    
+    console.log('Estadísticas Response status:', response.status);
+    console.log('Estadísticas Response ok:', response.ok);
+    
+    const responseText = await response.text();
+    console.log('Estadísticas Response text:', responseText);
 
     if (!response.ok) {
-      throw new Error('Error al obtener estadísticas');
+      throw new Error(`Error al obtener estadísticas: ${response.status} - ${responseText}`);
     }
 
-    const data = await response.json();
+    const data = JSON.parse(responseText);
+    console.log('Estadísticas datos parseados:', data);
     return data;
   } catch (error) {
     console.error('Get estadisticas error:', error);
