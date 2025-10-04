@@ -43,8 +43,14 @@ export async function login(credentials: LoginCredentials): Promise<User> {
 
     const data = await response.json();
     console.log('Login successful - Full response:', JSON.stringify(data, null, 2));
-    console.log('User data being returned:', JSON.stringify(data.user, null, 2));
-    return data.user;
+    
+    const userData = {
+      ...data.user,
+      token: data.token
+    };
+    
+    console.log('User data being returned:', JSON.stringify(userData, null, 2));
+    return userData;
   } catch (error) {
     console.error('Login error:', error);
     
@@ -96,8 +102,15 @@ export async function loginPersonal(credentials: PersonalLoginCredentials): Prom
     }
 
     const data = await response.json();
-    console.log('Personal login successful');
-    return data.user;
+    console.log('Personal login successful - Full response:', JSON.stringify(data, null, 2));
+    
+    const userData = {
+      ...data.user,
+      token: data.token
+    };
+    
+    console.log('Personal user data being returned:', JSON.stringify(userData, null, 2));
+    return userData;
   } catch (error) {
     console.error('Personal login error:', error);
     
