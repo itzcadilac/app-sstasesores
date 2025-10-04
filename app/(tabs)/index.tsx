@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { Building2, User, FileText, TrendingUp, Clock, CheckCircle } from 'lucide-react-native';
@@ -21,27 +21,25 @@ export default function HomeScreen() {
   const [estadisticas, setEstadisticas] = useState<EstadisticasEmpresa>({ cantidadSolicitudes: 0, capacitados: 0 });
   const [isLoadingStats, setIsLoadingStats] = useState(false);
 
-  const loadEstadisticas = useCallback(async () => {
-    if (!user?.ruc || !user?.token) return;
-    
-    try {
-      setIsLoadingStats(true);
-      console.log('Cargando estadísticas para RUC:', user.ruc);
-      const stats = await obtenerEstadisticasEmpresa(user.ruc, user.token);
-      console.log('Estadísticas cargadas:', stats);
-      setEstadisticas(stats);
-    } catch (error) {
-      console.error('Error loading estadisticas:', error);
-    } finally {
-      setIsLoadingStats(false);
-    }
-  }, [user?.ruc, user?.token]);
-
   useEffect(() => {
+    const loadEstadisticas = async () => {
+      if (!isEmpresa || !user?.ruc || !user?.token) return;
+      
+      try {
+        setIsLoadingStats(true);
+        console.log('Cargando estadísticas para RUC:', user.ruc);
+        const stats = await obtenerEstadisticasEmpresa(user.ruc, user.token);
+        console.log('Estadísticas cargadas:', stats);
+        setEstadisticas(stats);
+      } catch (error) {
+        console.error('Error loading estadisticas:', error);
+      } finally {
+        setIsLoadingStats(false);
+      }
+    };
+
     console.log('useEffect ejecutado - isEmpresa:', isEmpresa, 'user?.ruc:', user?.ruc, 'user?.token:', user?.token ? 'presente' : 'ausente');
-    if (isEmpresa && user?.ruc && user?.token) {
-      loadEstadisticas();
-    }
+    loadEstadisticas();
   }, [isEmpresa, user?.ruc, user?.token]);
 
   return (
