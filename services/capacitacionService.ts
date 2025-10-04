@@ -114,13 +114,17 @@ export async function obtenerSolicitudesEmpresa(empresaId: string, token: string
   }
 }
 
-export async function obtenerEstadisticasEmpresa(ruc: string): Promise<EstadisticasEmpresa> {
+export async function obtenerEstadisticasEmpresa(ruc: string, token: string): Promise<EstadisticasEmpresa> {
   try {
     const url = `${API_BASE_URL}/estadisticas.php?ruc=${ruc}`;
     console.log('Obteniendo estadísticas - URL:', url);
     console.log('Obteniendo estadísticas - RUC:', ruc);
     
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
     
     console.log('Estadísticas Response status:', response.status);
     console.log('Estadísticas Response ok:', response.ok);
@@ -144,14 +148,18 @@ export async function obtenerEstadisticasEmpresa(ruc: string): Promise<Estadisti
   }
 }
 
-export async function buscarCapacitadosPorDocumento(ruc: string, documento: string): Promise<CapacitadoResult[]> {
+export async function buscarCapacitadosPorDocumento(ruc: string, documento: string, token: string): Promise<CapacitadoResult[]> {
   try {
     const url = `${API_BASE_URL}/buscar_capacitados.php?ruc=${ruc}&documento=${documento}`;
     console.log('Buscando capacitados - URL:', url);
     console.log('Buscando capacitados - RUC:', ruc);
     console.log('Buscando capacitados - Documento:', documento);
     
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
     
     console.log('Response status:', response.status);
     console.log('Response ok:', response.ok);

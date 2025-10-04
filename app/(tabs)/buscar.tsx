@@ -31,7 +31,7 @@ export default function BuscarScreen() {
   const [hasSearched, setHasSearched] = useState(false);
 
   const handleSearch = async () => {
-    if (!searchQuery.trim() || !user?.ruc) {
+    if (!searchQuery.trim() || !user?.ruc || !user?.token) {
       return;
     }
 
@@ -40,7 +40,7 @@ export default function BuscarScreen() {
 
     try {
       console.log('Buscando por documento:', searchQuery);
-      const data = await buscarCapacitadosPorDocumento(user.ruc, searchQuery);
+      const data = await buscarCapacitadosPorDocumento(user.ruc, searchQuery, user.token);
       setResults(data);
     } catch (error) {
       console.error('Error en búsqueda:', error);

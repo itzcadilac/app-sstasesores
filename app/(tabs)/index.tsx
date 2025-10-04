@@ -28,11 +28,11 @@ export default function HomeScreen() {
   }, [isEmpresa, user?.ruc]);
 
   const loadEstadisticas = async () => {
-    if (!user?.ruc) return;
+    if (!user?.ruc || !user?.token) return;
     
     try {
       setIsLoadingStats(true);
-      const stats = await obtenerEstadisticasEmpresa(user.ruc);
+      const stats = await obtenerEstadisticasEmpresa(user.ruc, user.token);
       setEstadisticas(stats);
     } catch (error) {
       console.error('Error loading estadisticas:', error);

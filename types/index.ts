@@ -8,6 +8,7 @@ export interface User {
   documento?: string;
   empresa?: string;
   ruc?: string;
+  token: string;
 }
 
 export interface LoginCredentials {
