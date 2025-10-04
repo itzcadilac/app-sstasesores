@@ -124,8 +124,6 @@ export async function obtenerEstadisticasEmpresa(ruc: string, token: string): Pr
     const response = await fetch(url, {
       headers: {
         'Authorization': `Bearer ${token}`,
-        'X-Auth-Token': token,
-        'Content-Type': 'application/json',
       },
     });
     
@@ -163,8 +161,6 @@ export async function buscarCapacitadosPorDocumento(ruc: string, documento: stri
     const response = await fetch(url, {
       headers: {
         'Authorization': `Bearer ${token}`,
-        'X-Auth-Token': token,
-        'Content-Type': 'application/json',
       },
     });
     
