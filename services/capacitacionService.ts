@@ -74,12 +74,19 @@ export async function buscarCapacitados(empresaId: string, filtros: {
   }
 }
 
-export async function consultarCapacitacionesPersonales(documento: string): Promise<Capacitacion[]> {
+export async function consultarCapacitacionesPersonales(documento: string, token?: string): Promise<Capacitacion[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/capacitaciones/personal/${documento}`);
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+      headers['x-auth-token'] = token;
+    }
+
+    const response = await fetch(`${API_BASE_URL}/capacitaciones/personal/${documento}`, { headers });
 
     if (!response.ok) {
-      throw new Error('No se encontraron capacitaciones');
+      const text = await response.text();
+      throw new Error(`No se encontraron capacitaciones: ${response.status} - ${text}`);
     }
 
     return await response.json();
@@ -95,11 +102,13 @@ export async function consultarCapacitacionesPersonales(documento: string): Prom
 export async function consultarCapacitacionesPorDocumento(documento: string, token?: string): Promise<unknown[]> {
   try {
     const url = `${API_BASE_URL}/capacitaciones/personal/${documento}`;
-    const response = await fetch(url, {
-      headers: {
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-    });
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+      headers['x-auth-token'] = token;
+    }
+
+    const response = await fetch(url, { headers });
 
     if (!response.ok) {
       const text = await response.text();
