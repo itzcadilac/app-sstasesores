@@ -81,7 +81,7 @@ export async function buscarCapacitados(empresaId: string, filtros: {
 
 export async function consultarCapacitacionesPersonales(documento: string, token?: string): Promise<Capacitacion[]> {
   try {
-    const url = `${API_BASE_URL}/capacitaciones/personal/${documento}`;
+    const url = `${API_BASE_URL}/personal/capacitaciones?documento=${encodeURIComponent(documento)}`;
     const headers: Record<string, string> = {};
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
@@ -117,7 +117,7 @@ export async function consultarCapacitacionesPersonales(documento: string, token
 
 export async function consultarCapacitacionesPorDocumento(documento: string, token?: string): Promise<unknown[]> {
   try {
-    const url = `${API_BASE_URL}/capacitaciones/personal/${documento}`;
+    const url = `${API_BASE_URL}/personal/capacitaciones?documento=${encodeURIComponent(documento)}`;
     const headers: Record<string, string> = {};
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
