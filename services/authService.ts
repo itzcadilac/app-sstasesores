@@ -27,7 +27,7 @@ export async function login(credentials: LoginCredentials): Promise<User> {
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
           const error = await response.json();
-          errorMessage = error.message || errorMessage;
+          errorMessage = (error && (error.message ?? error.error)) || errorMessage;
         } else {
           const text = await response.text();
           console.log('Server response (non-JSON):', text);
@@ -43,12 +43,15 @@ export async function login(credentials: LoginCredentials): Promise<User> {
 
     const data = await response.json();
     console.log('Login successful - Full response:', JSON.stringify(data, null, 2));
-    
-    const userData = {
-      ...data.user,
-      token: data.token
-    };
-    
+
+    const possibleToken = (data && (data.token ?? data.jwt ?? data.access_token ?? (data.user ? data.user.token : undefined))) as string | undefined;
+    const token = typeof possibleToken === 'string' && possibleToken.length > 0 ? possibleToken : '';
+    const userData: User = {
+      ...(data.user ?? {}),
+      token,
+    } as User;
+
+    console.log('Resolved token present?', !!userData.token, userData.token ? userData.token.substring(0, 16) + '...' : 'NO TOKEN');
     console.log('User data being returned:', JSON.stringify(userData, null, 2));
     return userData;
   } catch (error) {
@@ -87,7 +90,7 @@ export async function loginPersonal(credentials: PersonalLoginCredentials): Prom
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
           const error = await response.json();
-          errorMessage = error.message || errorMessage;
+          errorMessage = (error && (error.message ?? error.error)) || errorMessage;
         } else {
           const text = await response.text();
           console.log('Server response (non-JSON):', text);
@@ -103,12 +106,15 @@ export async function loginPersonal(credentials: PersonalLoginCredentials): Prom
 
     const data = await response.json();
     console.log('Personal login successful - Full response:', JSON.stringify(data, null, 2));
-    
-    const userData = {
-      ...data.user,
-      token: data.token
-    };
-    
+
+    const possibleToken = (data && (data.token ?? data.jwt ?? data.access_token ?? (data.user ? data.user.token : undefined))) as string | undefined;
+    const token = typeof possibleToken === 'string' && possibleToken.length > 0 ? possibleToken : '';
+    const userData: User = {
+      ...(data.user ?? {}),
+      token,
+    } as User;
+
+    console.log('Resolved personal token present?', !!userData.token, userData.token ? userData.token.substring(0, 16) + '...' : 'NO TOKEN');
     console.log('Personal user data being returned:', JSON.stringify(userData, null, 2));
     return userData;
   } catch (error) {

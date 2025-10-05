@@ -45,7 +45,7 @@ export default function HomeScreen() {
 
   useEffect(() => {
     const loadPersonalCounts = async () => {
-      if (!isPersonal || !user?.documento) return;
+      if (!isPersonal || !user?.documento || !user?.token) return;
       try {
         setIsLoadingPersonal(true);
         const list = await consultarCapacitacionesPorDocumento(user.documento, user.token);
