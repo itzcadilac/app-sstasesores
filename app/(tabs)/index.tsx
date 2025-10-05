@@ -5,7 +5,7 @@ import { Building2, User, FileText, TrendingUp, Search } from 'lucide-react-nati
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import Colors from '@/constants/Colors';
-import { obtenerEstadisticasEmpresa, consultarCapacitacionesPorDocumento } from '@/services/capacitacionService';
+import { obtenerEstadisticasEmpresa, consultarCapacitacionesPorDocumento, obtenerEstadisticasPersonal } from '@/services/capacitacionService';
 
 const fontWeight700 = '700' as const;
 const fontWeight600 = '600' as const;
@@ -48,8 +48,9 @@ export default function HomeScreen() {
       if (!isPersonal || !user?.documento || !user?.token) return;
       try {
         setIsLoadingPersonal(true);
-        const list = await consultarCapacitacionesPorDocumento(user.documento, user.token);
-        const count = Array.isArray(list) ? list.length : 0;
+        console.log('Cargando estadísticas personales para documento:', user.documento);
+        const stats = await obtenerEstadisticasPersonal(user.documento, user.token);
+        const count = typeof stats?.capacitacionesCount === 'number' ? stats.capacitacionesCount : 0;
         setCapacitacionesCount(count);
       } catch (e) {
         console.error('Error cargando capacitaciones personales', e);

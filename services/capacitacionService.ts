@@ -15,6 +15,11 @@ interface CapacitadoResult {
   nota: string;
 }
 
+interface EstadisticasPersonal {
+  documento: string;
+  capacitacionesCount: number;
+}
+
 export async function crearSolicitud(solicitud: SolicitudCapacitacion, token: string): Promise<SolicitudCapacitacion> {
   try {
     const response = await fetch(`${API_BASE_URL}/solicitudes`, {
@@ -139,6 +144,40 @@ export async function consultarCapacitacionesPorDocumento(documento: string, tok
     return await response.json();
   } catch (error) {
     console.error('Consultar capacitaciones por documento error:', error);
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error('Error de conexión');
+  }
+}
+
+export async function obtenerEstadisticasPersonal(documento: string, token: string): Promise<EstadisticasPersonal> {
+  try {
+    const url = `${API_BASE_URL}/personal/estadisticas?documento=${encodeURIComponent(documento)}`;
+    console.log('Obteniendo estadísticas personal - URL:', url);
+    console.log('Obteniendo estadísticas personal - Documento:', documento);
+    console.log('Obteniendo estadísticas personal - Token:', token ? `${token.substring(0, 20)}...` : 'NO TOKEN');
+
+    const response = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'x-auth-token': token,
+      },
+    });
+
+    const responseText = await response.text();
+    console.log('Estadísticas personal Response status:', response.status);
+    console.log('Estadísticas personal Response ok:', response.ok);
+    console.log('Estadísticas personal Response text:', responseText);
+
+    if (!response.ok) {
+      throw new Error(`Error al obtener estadísticas personales: ${response.status} - ${responseText}`);
+    }
+
+    const data = JSON.parse(responseText) as EstadisticasPersonal;
+    return data;
+  } catch (error) {
+    console.error('Get estadisticas personal error:', error);
     if (error instanceof Error) {
       throw error;
     }
