@@ -92,6 +92,30 @@ export async function consultarCapacitacionesPersonales(documento: string): Prom
   }
 }
 
+export async function consultarCapacitacionesPorDocumento(documento: string, token?: string): Promise<unknown[]> {
+  try {
+    const url = `${API_BASE_URL}/capacitaciones/personal/${documento}`;
+    const response = await fetch(url, {
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`No se encontraron capacitaciones: ${response.status} - ${text}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Consultar capacitaciones por documento error:', error);
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error('Error de conexión');
+  }
+}
+
 export async function obtenerSolicitudesEmpresa(empresaId: string, token: string): Promise<SolicitudCapacitacion[]> {
   try {
     const response = await fetch(`${API_BASE_URL}/solicitudes/empresa/${empresaId}`, {

@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
-import { Building2, User, FileText, TrendingUp, Clock, CheckCircle } from 'lucide-react-native';
+import { Building2, User, FileText, TrendingUp, Search } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import Colors from '@/constants/Colors';
-import { obtenerEstadisticasEmpresa } from '@/services/capacitacionService';
+import { obtenerEstadisticasEmpresa, consultarCapacitacionesPorDocumento } from '@/services/capacitacionService';
 
 const fontWeight700 = '700' as const;
 const fontWeight600 = '600' as const;
@@ -16,15 +16,16 @@ interface EstadisticasEmpresa {
 }
 
 export default function HomeScreen() {
-  const { user, isEmpresa } = useAuth();
+  const { user, isEmpresa, isPersonal } = useAuth();
   const router = useRouter();
   const [estadisticas, setEstadisticas] = useState<EstadisticasEmpresa>({ cantidadSolicitudes: 0, capacitados: 0 });
   const [isLoadingStats, setIsLoadingStats] = useState(false);
+  const [capacitacionesCount, setCapacitacionesCount] = useState<number>(0);
+  const [isLoadingPersonal, setIsLoadingPersonal] = useState<boolean>(false);
 
   useEffect(() => {
     const loadEstadisticas = async () => {
       if (!isEmpresa || !user?.ruc || !user?.token) return;
-      
       try {
         setIsLoadingStats(true);
         console.log('Cargando estadísticas para RUC:', user.ruc);
@@ -41,6 +42,24 @@ export default function HomeScreen() {
     console.log('useEffect ejecutado - isEmpresa:', isEmpresa, 'user?.ruc:', user?.ruc, 'user?.token:', user?.token ? 'presente' : 'ausente');
     loadEstadisticas();
   }, [isEmpresa, user?.ruc, user?.token]);
+
+  useEffect(() => {
+    const loadPersonalCounts = async () => {
+      if (!isPersonal || !user?.documento) return;
+      try {
+        setIsLoadingPersonal(true);
+        const list = await consultarCapacitacionesPorDocumento(user.documento, user.token);
+        const count = Array.isArray(list) ? list.length : 0;
+        setCapacitacionesCount(count);
+      } catch (e) {
+        console.error('Error cargando capacitaciones personales', e);
+        setCapacitacionesCount(0);
+      } finally {
+        setIsLoadingPersonal(false);
+      }
+    };
+    loadPersonalCounts();
+  }, [isPersonal, user?.documento, user?.token]);
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -95,24 +114,12 @@ export default function HomeScreen() {
               <View style={[styles.statIcon, { backgroundColor: Colors.primary + '20' }]}>
                 <FileText size={24} color={Colors.primary} />
               </View>
-              <Text style={styles.statValue}>0</Text>
+              {isLoadingPersonal ? (
+                <ActivityIndicator size="small" color={Colors.primary} />
+              ) : (
+                <Text style={styles.statValue}>{capacitacionesCount}</Text>
+              )}
               <Text style={styles.statLabel}>Capacitaciones</Text>
-            </View>
-
-            <View style={styles.statCard}>
-              <View style={[styles.statIcon, { backgroundColor: Colors.success + '20' }]}>
-                <CheckCircle size={24} color={Colors.success} />
-              </View>
-              <Text style={styles.statValue}>0</Text>
-              <Text style={styles.statLabel}>Completadas</Text>
-            </View>
-
-            <View style={styles.statCard}>
-              <View style={[styles.statIcon, { backgroundColor: Colors.warning + '20' }]}>
-                <Clock size={24} color={Colors.warning} />
-              </View>
-              <Text style={styles.statValue}>0</Text>
-              <Text style={styles.statLabel}>En Proceso</Text>
             </View>
           </>
         )}
@@ -144,12 +151,16 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
         ) : (
-          <View style={styles.infoCard}>
-            <FileText size={48} color={Colors.primary} />
-            <Text style={styles.infoTitle}>Consulta tus Capacitaciones</Text>
-            <Text style={styles.infoText}>
-              Accede a tu historial de capacitaciones, certificados y más información desde tu perfil.
-            </Text>
+          <View style={styles.quickActions}>
+            <TouchableOpacity testID="go-consulta-capacitaciones" style={styles.actionCard} onPress={() => router.push('/(tabs)/consulta-capacitaciones')}>
+              <LinearGradient
+                colors={[Colors.primary, Colors.primaryDark]}
+                style={styles.actionGradient}
+              >
+                <Search size={32} color="#FFFFFF" />
+                <Text style={styles.actionText}>Consulta Capacitaciones</Text>
+              </LinearGradient>
+            </TouchableOpacity>
           </View>
         )}
       </View>

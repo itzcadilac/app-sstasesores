@@ -1,5 +1,5 @@
 import { Tabs, useRouter } from "expo-router";
-import { Home, FileText, Search, User, LogOut } from "lucide-react-native";
+import { Home, Search, User, LogOut } from "lucide-react-native";
 import React from "react";
 import { TouchableOpacity } from "react-native";
 import { useAuth } from "@/contexts/AuthContext";
@@ -46,22 +46,22 @@ export default function TabLayout() {
         }}
       />
       {isEmpresa && (
-        <>
-          <Tabs.Screen
-            name="solicitud"
-            options={{
-              title: "Nueva Solicitud",
-              tabBarIcon: ({ color }) => <FileText size={24} color={color} />,
-            }}
-          />
-          <Tabs.Screen
-            name="buscar"
-            options={{
-              title: "Buscar",
-              tabBarIcon: ({ color }) => <Search size={24} color={color} />,
-            }}
-          />
-        </>
+        <Tabs.Screen
+          name="buscar"
+          options={{
+            title: "Buscar",
+            tabBarIcon: ({ color }) => <Search size={24} color={color} />,
+          }}
+        />
+      )}
+      {!isEmpresa && (
+        <Tabs.Screen
+          name="consulta-capacitaciones"
+          options={{
+            title: "Capacitaciones",
+            tabBarIcon: ({ color }) => <Search size={24} color={color} />,
+          }}
+        />
       )}
       <Tabs.Screen
         name="perfil"
