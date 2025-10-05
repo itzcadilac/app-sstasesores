@@ -39,11 +39,9 @@ export default function BuscarScreen() {
     setHasSearched(true);
 
     try {
-      console.log('Buscando por documento:', searchQuery);
       const data = await buscarCapacitadosPorDocumento(user.ruc, searchQuery, user.token);
       setResults(data);
-    } catch (error) {
-      console.error('Error en búsqueda:', error);
+    } catch {
       setResults([]);
     } finally {
       setIsSearching(false);
@@ -311,5 +309,5 @@ const styles = StyleSheet.create({
     color: Colors.text,
     flex: 1,
   },
-
+ 
 });

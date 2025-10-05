@@ -28,18 +28,14 @@ export default function HomeScreen() {
       if (!isEmpresa || !user?.ruc || !user?.token) return;
       try {
         setIsLoadingStats(true);
-        console.log('Cargando estadísticas para RUC:', user.ruc);
         const stats = await obtenerEstadisticasEmpresa(user.ruc, user.token);
-        console.log('Estadísticas cargadas:', stats);
         setEstadisticas(stats);
-      } catch (error) {
-        console.error('Error loading estadisticas:', error);
+      } catch {
       } finally {
         setIsLoadingStats(false);
       }
     };
 
-    console.log('useEffect ejecutado - isEmpresa:', isEmpresa, 'user?.ruc:', user?.ruc, 'user?.token:', user?.token ? 'presente' : 'ausente');
     loadEstadisticas();
   }, [isEmpresa, user?.ruc, user?.token]);
 
@@ -48,12 +44,10 @@ export default function HomeScreen() {
       if (!isPersonal || !user?.documento || !user?.token) return;
       try {
         setIsLoadingPersonal(true);
-        console.log('Cargando estadísticas personales para documento:', user.documento);
         const stats = await obtenerEstadisticasPersonal(user.documento, user.token);
         const count = typeof stats?.capacitacionesCount === 'number' ? stats.capacitacionesCount : 0;
         setCapacitacionesCount(count);
-      } catch (e) {
-        console.error('Error cargando capacitaciones personales', e);
+      } catch {
         setCapacitacionesCount(0);
       } finally {
         setIsLoadingPersonal(false);

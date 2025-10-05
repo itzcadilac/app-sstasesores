@@ -17,8 +17,7 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
       if (stored) {
         setUser(JSON.parse(stored));
       }
-    } catch (err) {
-      console.error('Error loading stored user:', err);
+    } catch {
     } finally {
       setIsLoading(false);
     }
@@ -62,8 +61,7 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     try {
       setUser(null);
       await AsyncStorage.removeItem(AUTH_STORAGE_KEY);
-    } catch (err) {
-      console.error('Error during logout:', err);
+    } catch {
     }
   }, []);
 

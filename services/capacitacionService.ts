@@ -38,7 +38,6 @@ export async function crearSolicitud(solicitud: SolicitudCapacitacion, token: st
 
     return await response.json();
   } catch (error) {
-    console.error('Create solicitud error:', error);
     if (error instanceof Error) {
       throw error;
     }
@@ -71,7 +70,6 @@ export async function buscarCapacitados(empresaId: string, filtros: {
 
     return await response.json();
   } catch (error) {
-    console.error('Search capacitados error:', error);
     if (error instanceof Error) {
       throw error;
     }
@@ -88,10 +86,6 @@ export async function consultarCapacitacionesPersonales(documento: string, token
       headers['x-auth-token'] = token;
     }
 
-    console.log('Consultando capacitaciones personales - URL:', url);
-    console.log('Consultando capacitaciones personales - Documento:', documento);
-    console.log('Consultando capacitaciones personales - Token presente?:', !!token);
-
     const response = await fetch(url, {
       method: 'GET',
       headers,
@@ -101,13 +95,11 @@ export async function consultarCapacitacionesPersonales(documento: string, token
 
     if (!response.ok) {
       const text = await response.text();
-      console.log('Respuesta no OK consultarCapacitacionesPersonales:', response.status, text);
       throw new Error(`No se encontraron capacitaciones: ${response.status} - ${text}`);
     }
 
     return await response.json();
   } catch (error) {
-    console.error('Consultar capacitaciones error:', error);
     if (error instanceof Error) {
       throw error;
     }
@@ -124,10 +116,6 @@ export async function consultarCapacitacionesPorDocumento(documento: string, tok
       headers['x-auth-token'] = token;
     }
 
-    console.log('Consultando capacitaciones por documento - URL:', url);
-    console.log('Consultando capacitaciones por documento - Documento:', documento);
-    console.log('Consultando capacitaciones por documento - Token presente?:', !!token);
-
     const response = await fetch(url, {
       method: 'GET',
       headers,
@@ -137,13 +125,11 @@ export async function consultarCapacitacionesPorDocumento(documento: string, tok
 
     if (!response.ok) {
       const text = await response.text();
-      console.log('Respuesta no OK consultarCapacitacionesPorDocumento:', response.status, text);
       throw new Error(`No se encontraron capacitaciones: ${response.status} - ${text}`);
     }
 
     return await response.json();
   } catch (error) {
-    console.error('Consultar capacitaciones por documento error:', error);
     if (error instanceof Error) {
       throw error;
     }
@@ -154,9 +140,6 @@ export async function consultarCapacitacionesPorDocumento(documento: string, tok
 export async function obtenerEstadisticasPersonal(documento: string, token: string): Promise<EstadisticasPersonal> {
   try {
     const url = `${API_BASE_URL}/personal/estadisticas?documento=${encodeURIComponent(documento)}`;
-    console.log('Obteniendo estadísticas personal - URL:', url);
-    console.log('Obteniendo estadísticas personal - Documento:', documento);
-    console.log('Obteniendo estadísticas personal - Token:', token ? `${token.substring(0, 20)}...` : 'NO TOKEN');
 
     const response = await fetch(url, {
       headers: {
@@ -166,9 +149,6 @@ export async function obtenerEstadisticasPersonal(documento: string, token: stri
     });
 
     const responseText = await response.text();
-    console.log('Estadísticas personal Response status:', response.status);
-    console.log('Estadísticas personal Response ok:', response.ok);
-    console.log('Estadísticas personal Response text:', responseText);
 
     if (!response.ok) {
       throw new Error(`Error al obtener estadísticas personales: ${response.status} - ${responseText}`);
@@ -177,7 +157,6 @@ export async function obtenerEstadisticasPersonal(documento: string, token: stri
     const data = JSON.parse(responseText) as EstadisticasPersonal;
     return data;
   } catch (error) {
-    console.error('Get estadisticas personal error:', error);
     if (error instanceof Error) {
       throw error;
     }
@@ -199,7 +178,6 @@ export async function obtenerSolicitudesEmpresa(empresaId: string, token: string
 
     return await response.json();
   } catch (error) {
-    console.error('Get solicitudes error:', error);
     if (error instanceof Error) {
       throw error;
     }
@@ -210,9 +188,6 @@ export async function obtenerSolicitudesEmpresa(empresaId: string, token: string
 export async function obtenerEstadisticasEmpresa(ruc: string, token: string): Promise<EstadisticasEmpresa> {
   try {
     const url = `${API_BASE_URL}/estadisticas.php?ruc=${ruc}`;
-    console.log('Obteniendo estadísticas - URL:', url);
-    console.log('Obteniendo estadísticas - RUC:', ruc);
-    console.log('Obteniendo estadísticas - Token:', token ? `${token.substring(0, 20)}...` : 'NO TOKEN');
     
     const response = await fetch(url, {
       headers: {
@@ -221,22 +196,15 @@ export async function obtenerEstadisticasEmpresa(ruc: string, token: string): Pr
       },
     });
     
-    console.log('Estadísticas Response status:', response.status);
-    console.log('Estadísticas Response ok:', response.ok);
-    console.log('Estadísticas Response headers:', JSON.stringify(Object.fromEntries(response.headers.entries())));
-    
     const responseText = await response.text();
-    console.log('Estadísticas Response text:', responseText);
 
     if (!response.ok) {
       throw new Error(`Error al obtener estadísticas: ${response.status} - ${responseText}`);
     }
 
     const data = JSON.parse(responseText);
-    console.log('Estadísticas datos parseados:', data);
-    return data;
+    return data as EstadisticasEmpresa;
   } catch (error) {
-    console.error('Get estadisticas error:', error);
     if (error instanceof Error) {
       throw error;
     }
@@ -247,10 +215,6 @@ export async function obtenerEstadisticasEmpresa(ruc: string, token: string): Pr
 export async function buscarCapacitadosPorDocumento(ruc: string, documento: string, token: string): Promise<CapacitadoResult[]> {
   try {
     const url = `${API_BASE_URL}/buscar_capacitados.php?ruc=${ruc}&documento=${documento}`;
-    console.log('Buscando capacitados - URL:', url);
-    console.log('Buscando capacitados - RUC:', ruc);
-    console.log('Buscando capacitados - Documento:', documento);
-    console.log('Buscando capacitados - Token:', token ? `${token.substring(0, 20)}...` : 'NO TOKEN');
     
     const response = await fetch(url, {
       headers: {
@@ -259,21 +223,15 @@ export async function buscarCapacitadosPorDocumento(ruc: string, documento: stri
       },
     });
     
-    console.log('Response status:', response.status);
-    console.log('Response ok:', response.ok);
-    
     const responseText = await response.text();
-    console.log('Response text:', responseText);
 
     if (!response.ok) {
       throw new Error(`Error al buscar capacitados: ${response.status} - ${responseText}`);
     }
 
     const data = JSON.parse(responseText);
-    console.log('Datos parseados:', data);
-    return data;
+    return data as CapacitadoResult[];
   } catch (error) {
-    console.error('Buscar capacitados error:', error);
     if (error instanceof Error) {
       throw error;
     }

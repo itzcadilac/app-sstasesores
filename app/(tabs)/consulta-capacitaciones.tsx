@@ -50,7 +50,6 @@ export default function ConsultaCapacitacionesScreen() {
       const parsed = Array.isArray(data) ? (data as CapacitacionRow[]) : [];
       setRows(parsed);
     } catch (e) {
-      console.error('ConsultaCapacitaciones fetch error', e);
       setError(e instanceof Error ? e.message : 'Error desconocido');
       setRows([]);
     } finally {

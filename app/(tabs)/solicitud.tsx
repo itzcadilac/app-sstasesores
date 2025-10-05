@@ -69,8 +69,8 @@ export default function SolicitudScreen() {
     setIsSubmitting(true);
 
     try {
-      console.log('Enviando solicitud:', solicitud);
       
+
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       Alert.alert(
