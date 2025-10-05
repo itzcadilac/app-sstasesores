@@ -76,16 +76,27 @@ export async function buscarCapacitados(empresaId: string, filtros: {
 
 export async function consultarCapacitacionesPersonales(documento: string, token?: string): Promise<Capacitacion[]> {
   try {
+    const url = `${API_BASE_URL}/capacitaciones/personal/${documento}`;
     const headers: Record<string, string> = {};
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
       headers['x-auth-token'] = token;
     }
 
-    const response = await fetch(`${API_BASE_URL}/capacitaciones/personal/${documento}`, { headers });
+    console.log('Consultando capacitaciones personales - URL:', url);
+    console.log('Consultando capacitaciones personales - Documento:', documento);
+    console.log('Consultando capacitaciones personales - Token presente?:', !!token);
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+      cache: 'no-store',
+      mode: 'cors',
+    });
 
     if (!response.ok) {
       const text = await response.text();
+      console.log('Respuesta no OK consultarCapacitacionesPersonales:', response.status, text);
       throw new Error(`No se encontraron capacitaciones: ${response.status} - ${text}`);
     }
 
@@ -108,10 +119,20 @@ export async function consultarCapacitacionesPorDocumento(documento: string, tok
       headers['x-auth-token'] = token;
     }
 
-    const response = await fetch(url, { headers });
+    console.log('Consultando capacitaciones por documento - URL:', url);
+    console.log('Consultando capacitaciones por documento - Documento:', documento);
+    console.log('Consultando capacitaciones por documento - Token presente?:', !!token);
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+      cache: 'no-store',
+      mode: 'cors',
+    });
 
     if (!response.ok) {
       const text = await response.text();
+      console.log('Respuesta no OK consultarCapacitacionesPorDocumento:', response.status, text);
       throw new Error(`No se encontraron capacitaciones: ${response.status} - ${text}`);
     }
 
