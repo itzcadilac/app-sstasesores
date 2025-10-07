@@ -1,14 +1,47 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, TextInput, ActivityIndicator, Alert } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
-import { User, Building2, Mail, FileText, Phone } from 'lucide-react-native';
+import { User, Building2, Mail, FileText, Phone, Lock } from 'lucide-react-native';
 import Colors from '@/constants/Colors';
+import { changeEmpresaPassword, ChangePasswordInput } from '@/services/authService';
 
 const fontWeight700 = '700' as const;
 const fontWeight600 = '600' as const;
 
 export default function PerfilScreen() {
   const { user, isEmpresa } = useAuth();
+  const [showPwdModal, setShowPwdModal] = useState<boolean>(false);
+  const [currentPassword, setCurrentPassword] = useState<string>('');
+  const [newPassword, setNewPassword] = useState<string>('');
+  const [confirmPassword, setConfirmPassword] = useState<string>('');
+  const [changing, setChanging] = useState<boolean>(false);
+
+  const canSubmit = useMemo(() => {
+    return !!currentPassword && !!newPassword && newPassword === confirmPassword;
+  }, [currentPassword, newPassword, confirmPassword]);
+
+  const onSubmitChange = async () => {
+    if (!user?.token) return;
+    if (!canSubmit) {
+      Alert.alert('Datos incompletos', 'Verifique que las contraseñas coincidan.');
+      return;
+    }
+    try {
+      setChanging(true);
+      const payload: ChangePasswordInput = { currentPassword, newPassword };
+      const res = await changeEmpresaPassword(payload, user.token);
+      Alert.alert('Éxito', res.message);
+      setShowPwdModal(false);
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'No se pudo cambiar la contraseña';
+      Alert.alert('Error', msg);
+    } finally {
+      setChanging(false);
+    }
+  };
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -28,7 +61,6 @@ export default function PerfilScreen() {
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Información</Text>
-        
         <View style={styles.infoCard}>
           <View style={styles.infoRow}>
             <View style={styles.infoIcon}>
@@ -61,6 +93,15 @@ export default function PerfilScreen() {
                   <Text style={styles.infoValue}>{user?.ruc || 'No disponible'}</Text>
                 </View>
               </View>
+
+              <TouchableOpacity
+                testID="btn-open-change-password"
+                style={styles.actionButton}
+                onPress={() => setShowPwdModal(true)}
+              >
+                <Lock size={18} color={Colors.surface} />
+                <Text style={styles.actionButtonText}>Cambiar contraseña</Text>
+              </TouchableOpacity>
             </>
           ) : (
             <View style={styles.infoRow}>
@@ -102,6 +143,65 @@ export default function PerfilScreen() {
           </TouchableOpacity>
         </View>
       </View>
+
+      <Modal
+        visible={showPwdModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowPwdModal(false)}
+      >
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalCard}>
+            <Text style={styles.modalTitle}>Cambiar contraseña</Text>
+            <TextInput
+              testID="input-current-password"
+              style={styles.input}
+              placeholder="Contraseña actual"
+              secureTextEntry
+              value={currentPassword}
+              onChangeText={setCurrentPassword}
+            />
+            <TextInput
+              testID="input-new-password"
+              style={styles.input}
+              placeholder="Nueva contraseña"
+              secureTextEntry
+              value={newPassword}
+              onChangeText={setNewPassword}
+            />
+            <TextInput
+              testID="input-confirm-password"
+              style={styles.input}
+              placeholder="Confirmar nueva contraseña"
+              secureTextEntry
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+            />
+            <View style={styles.modalActions}>
+              <TouchableOpacity
+                testID="btn-cancel-change-password"
+                style={[styles.modalButton, styles.modalButtonGhost]}
+                onPress={() => setShowPwdModal(false)}
+                disabled={changing}
+              >
+                <Text style={styles.modalButtonGhostText}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                testID="btn-submit-change-password"
+                style={[styles.modalButton, !canSubmit || changing ? styles.modalButtonDisabled : null]}
+                onPress={onSubmitChange}
+                disabled={!canSubmit || changing}
+              >
+                {changing ? (
+                  <ActivityIndicator color={Colors.surface} />
+                ) : (
+                  <Text style={styles.modalButtonText}>Guardar</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 }
@@ -188,6 +288,21 @@ const styles = StyleSheet.create({
     color: Colors.text,
     fontWeight: fontWeight600,
   },
+  actionButton: {
+    marginTop: 12,
+    backgroundColor: Colors.primary,
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    alignSelf: 'flex-start',
+  },
+  actionButtonText: {
+    color: '#FFFFFF',
+    fontWeight: fontWeight600,
+  },
   emptyState: {
     backgroundColor: Colors.surface,
     borderRadius: 16,
@@ -245,5 +360,60 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: fontWeight600,
     color: '#FFFFFF',
+  },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: Colors.overlay,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 16,
+  },
+  modalCard: {
+    width: '100%',
+    maxWidth: 420,
+    backgroundColor: Colors.surface,
+    borderRadius: 16,
+    padding: 16,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: fontWeight600,
+    color: Colors.text,
+    marginBottom: 12,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginTop: 8,
+    color: Colors.text,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginTop: 16,
+    gap: 12,
+  },
+  modalButton: {
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 10,
+  },
+  modalButtonDisabled: {
+    opacity: 0.6,
+  },
+  modalButtonText: {
+    color: '#FFFFFF',
+    fontWeight: fontWeight600,
+  },
+  modalButtonGhost: {
+    backgroundColor: Colors.borderLight,
+  },
+  modalButtonGhostText: {
+    color: Colors.text,
+    fontWeight: fontWeight600,
   },
 });

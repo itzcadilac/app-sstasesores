@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
-import { Search, User, FileText, Calendar } from 'lucide-react-native';
+import { Search, User, FileText, Calendar, CalendarClock } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { buscarCapacitadosPorDocumento } from '@/services/capacitacionService';
 import Colors from '@/constants/Colors';
@@ -53,6 +53,51 @@ export default function BuscarScreen() {
     if (notaNum >= 14) return Colors.success;
     if (notaNum >= 11) return Colors.warning;
     return Colors.error;
+  };
+
+  const parseDate = (isoOrYmd: string) => {
+    const cleaned = isoOrYmd?.replace(' ', 'T');
+    const d = new Date(cleaned);
+    if (isNaN(d.getTime())) {
+      const parts = isoOrYmd.split('-');
+      if (parts.length === 3) {
+        const y = parseInt(parts[0], 10);
+        const m = parseInt(parts[1], 10) - 1;
+        const da = parseInt(parts[2], 10);
+        return new Date(y, m, da);
+      }
+    }
+    return d;
+  };
+
+  const formatInicio = (fecha: string) => {
+    const d = parseDate(fecha);
+    return isNaN(d.getTime()) ? '-' : d.toLocaleDateString();
+  };
+
+  const addDays = (d: Date, days: number) => {
+    const copy = new Date(d.getTime());
+    copy.setDate(copy.getDate() + days);
+    return copy;
+  };
+
+  const formatVencimiento = (fecha: string) => {
+    const ini = parseDate(fecha);
+    if (isNaN(ini.getTime())) return '-';
+    const venc = addDays(new Date(ini.getFullYear() + 1, ini.getMonth(), ini.getDate()), -1);
+    return venc.toLocaleDateString();
+  };
+
+  const getVencimientoColor = (fecha: string) => {
+    const ini = parseDate(fecha);
+    if (isNaN(ini.getTime())) return Colors.text;
+    const venc = addDays(new Date(ini.getFullYear() + 1, ini.getMonth(), ini.getDate()), -1);
+    const now = new Date();
+    const diffMs = venc.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+    if (diffDays <= 7) return Colors.error;
+    if (diffDays <= 90) return Colors.warning;
+    return Colors.text;
   };
 
   return (
@@ -143,7 +188,11 @@ export default function BuscarScreen() {
                   </View>
                   <View style={styles.detailRow}>
                     <Calendar size={16} color={Colors.textSecondary} />
-                    <Text style={styles.detailText}>{result.fecha}</Text>
+                    <Text style={styles.detailText}>Inicio vigencia: {formatInicio(result.fecha)}</Text>
+                  </View>
+                  <View style={styles.detailRow}>
+                    <CalendarClock size={16} color={getVencimientoColor(result.fecha)} />
+                    <Text style={[styles.detailText, { color: getVencimientoColor(result.fecha) }]}>Vence: {formatVencimiento(result.fecha)}</Text>
                   </View>
                 </View>
               </View>

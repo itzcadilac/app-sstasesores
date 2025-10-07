@@ -2,6 +2,11 @@ import { User, LoginCredentials, PersonalLoginCredentials } from '@/types';
 
 const API_BASE_URL = 'https://software.sstasesores.pe/api';
 
+export interface ChangePasswordInput {
+  currentPassword: string;
+  newPassword: string;
+}
+
 export async function login(credentials: LoginCredentials): Promise<User> {
   try {
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
@@ -11,7 +16,7 @@ export async function login(credentials: LoginCredentials): Promise<User> {
       },
       body: JSON.stringify({
         ruc: credentials.ruc,
-        password: credentials.password
+        password: credentials.password,
       }),
     });
 
@@ -98,5 +103,42 @@ export async function loginPersonal(credentials: PersonalLoginCredentials): Prom
       throw error;
     }
     throw new Error('Error de conexión. Verifique su internet.');
+  }
+}
+
+export async function changeEmpresaPassword(input: ChangePasswordInput, token: string): Promise<{ message: string }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/auth/change-password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+        'x-auth-token': token,
+      },
+      body: JSON.stringify(input),
+    });
+
+    const text = await response.text();
+
+    if (!response.ok) {
+      let msg = 'No se pudo cambiar la contraseña';
+      try {
+        const err = JSON.parse(text);
+        msg = (err && (err.message ?? err.error)) || msg;
+      } catch {}
+      throw new Error(msg);
+    }
+
+    try {
+      const data = JSON.parse(text) as { message?: string };
+      return { message: data.message ?? 'Contraseña actualizada' };
+    } catch {
+      return { message: 'Contraseña actualizada' };
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error('Error de conexión');
   }
 }
