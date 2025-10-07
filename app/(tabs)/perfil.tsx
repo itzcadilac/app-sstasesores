@@ -28,7 +28,7 @@ export default function PerfilScreen() {
     }
     try {
       setChanging(true);
-      const payload: ChangePasswordInput = { currentPassword, newPassword };
+      const payload: ChangePasswordInput = { currentPassword, newPassword, idemp: user?.id ?? '', ruc: user?.ruc ?? '' };
       const res = await changeEmpresaPassword(payload, user.token);
       Alert.alert('Éxito', res.message);
       setShowPwdModal(false);

@@ -5,6 +5,8 @@ const API_BASE_URL = 'https://software.sstasesores.pe/api';
 export interface ChangePasswordInput {
   currentPassword: string;
   newPassword: string;
+  idemp: string;
+  ruc: string;
 }
 
 export async function login(credentials: LoginCredentials): Promise<User> {
@@ -108,14 +110,19 @@ export async function loginPersonal(credentials: PersonalLoginCredentials): Prom
 
 export async function changeEmpresaPassword(input: ChangePasswordInput, token: string): Promise<{ message: string }> {
   try {
-    const response = await fetch(`${API_BASE_URL}/auth/change-password`, {
+    const response = await fetch(`${API_BASE_URL}/change-password`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
         'x-auth-token': token,
       },
-      body: JSON.stringify(input),
+      body: JSON.stringify({
+        currentPassword: input.currentPassword,
+        newPassword: input.newPassword,
+        idemp: input.idemp,
+        ruc: input.ruc,
+      }),
     });
 
     const text = await response.text();
