@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, TextInput, ActivityIndicator, Alert } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { User, Building2, Mail, FileText, Phone, Lock } from 'lucide-react-native';
@@ -15,36 +15,54 @@ export default function PerfilScreen() {
   const [newPassword, setNewPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [changing, setChanging] = useState<boolean>(false);
+  const [bannerMessage, setBannerMessage] = useState<string>('');
+  const [bannerType, setBannerType] = useState<'success' | 'error' | 'info'>('info');
 
   const canSubmit = useMemo(() => {
     return !!currentPassword && !!newPassword && newPassword === confirmPassword;
   }, [currentPassword, newPassword, confirmPassword]);
 
-  const onSubmitChange = async () => {
+  const onSubmitChange = useCallback(async () => {
     if (!user?.token) return;
     if (!canSubmit) {
-      Alert.alert('Datos incompletos', 'Verifique que las contraseñas coincidan.');
+      setBannerType('error');
+      setBannerMessage('Verifique que las contraseñas coincidan.');
       return;
     }
     try {
       setChanging(true);
       const payload: ChangePasswordInput = { currentPassword, newPassword, idemp: user?.id ?? '', ruc: user?.ruc ?? '' };
       const res = await changeEmpresaPassword(payload, user.token);
-      Alert.alert('Éxito', res.message);
-      setShowPwdModal(false);
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
+      setBannerType(res.ok ? 'success' : 'info');
+      setBannerMessage(res.message);
+      if (res.ok) {
+        setShowPwdModal(false);
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+      }
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'No se pudo cambiar la contraseña';
-      Alert.alert('Error', msg);
+      setBannerType('error');
+      setBannerMessage(msg);
     } finally {
       setChanging(false);
     }
-  };
+  }, [user?.token, canSubmit, currentPassword, newPassword, user?.id, user?.ruc, confirmPassword]);
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      {bannerMessage ? (
+        <View
+          testID="banner-message"
+          style={[
+            styles.banner,
+            bannerType === 'success' ? styles.bannerSuccess : bannerType === 'error' ? styles.bannerError : styles.bannerInfo,
+          ]}
+        >
+          <Text style={styles.bannerText}>{bannerMessage}</Text>
+        </View>
+      ) : null}
       <View style={styles.profileHeader}>
         <View style={styles.avatarContainer}>
           {isEmpresa ? (
@@ -415,5 +433,24 @@ const styles = StyleSheet.create({
   modalButtonGhostText: {
     color: Colors.text,
     fontWeight: fontWeight600,
+  },
+  banner: {
+    margin: 16,
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+  },
+  bannerText: {
+    color: '#FFFFFF',
+    fontWeight: fontWeight600,
+  },
+  bannerSuccess: {
+    backgroundColor: '#16a34a',
+  },
+  bannerError: {
+    backgroundColor: '#dc2626',
+  },
+  bannerInfo: {
+    backgroundColor: '#2563eb',
   },
 });

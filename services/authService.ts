@@ -108,7 +108,7 @@ export async function loginPersonal(credentials: PersonalLoginCredentials): Prom
   }
 }
 
-export async function changeEmpresaPassword(input: ChangePasswordInput, token: string): Promise<{ message: string }> {
+export async function changeEmpresaPassword(input: ChangePasswordInput, token: string): Promise<{ ok: boolean; message: string }> {
   try {
     const response = await fetch(`${API_BASE_URL}/change-password`, {
       method: 'POST',
@@ -131,16 +131,18 @@ export async function changeEmpresaPassword(input: ChangePasswordInput, token: s
       let msg = 'No se pudo cambiar la contraseña';
       try {
         const err = JSON.parse(text);
-        msg = (err && (err.message ?? err.error)) || msg;
+        msg = (err && (err.message ?? err.error ?? err.msg)) || msg;
       } catch {}
       throw new Error(msg);
     }
 
     try {
-      const data = JSON.parse(text) as { message?: string };
-      return { message: data.message ?? 'Contraseña actualizada' };
+      const data = JSON.parse(text) as { ok?: boolean; status?: string; message?: string; msg?: string };
+      const ok = data.ok === true || data.status?.toLowerCase?.() === 'ok';
+      const message = ok ? 'Contraseña Cambiada Exitosamente.' : (data.message ?? data.msg ?? 'Operación realizada');
+      return { ok, message };
     } catch {
-      return { message: 'Contraseña actualizada' };
+      return { ok: true, message: 'Contraseña Cambiada Exitosamente.' };
     }
   } catch (error) {
     if (error instanceof Error) {
