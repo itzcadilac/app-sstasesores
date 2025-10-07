@@ -56,18 +56,27 @@ export default function BuscarScreen() {
   };
 
   const parseDate = (isoOrYmd: string) => {
-    const cleaned = isoOrYmd?.replace(' ', 'T');
-    const d = new Date(cleaned);
-    if (isNaN(d.getTime())) {
-      const parts = isoOrYmd.split('-');
-      if (parts.length === 3) {
-        const y = parseInt(parts[0], 10);
-        const m = parseInt(parts[1], 10) - 1;
-        const da = parseInt(parts[2], 10);
-        return new Date(y, m, da);
-      }
+    const str = (isoOrYmd ?? '').trim();
+    const ymdOnly = /^\d{4}-\d{2}-\d{2}$/;
+
+    if (ymdOnly.test(str)) {
+      const [y, m, d] = str.split('-').map((p) => parseInt(p, 10));
+      return new Date(y, m - 1, d);
     }
-    return d;
+
+    const cleaned = str.replace(' ', 'T');
+    const d = new Date(cleaned);
+    if (!isNaN(d.getTime())) return d;
+
+    const parts = str.split('-');
+    if (parts.length === 3) {
+      const y = parseInt(parts[0], 10);
+      const m = parseInt(parts[1], 10) - 1;
+      const da = parseInt(parts[2], 10);
+      return new Date(y, m, da);
+    }
+
+    return new Date(NaN);
   };
 
   const formatInicio = (fecha: string) => {
