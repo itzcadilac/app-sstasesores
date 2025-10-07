@@ -83,7 +83,7 @@ export default function LoginScreen() {
         >
           <View style={styles.header}>
             <Image
-              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/8gtp3xurxdqt9exz7kjwe' }}
+              source={{ uri: 'https://sstasesores.pe/logos/logo_sst.webp' }}
               style={styles.logoImage}
               resizeMode="contain"
               accessibilityLabel="Logo SST Asesores"
