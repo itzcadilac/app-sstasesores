@@ -9,12 +9,12 @@ import {
   Platform,
   ScrollView,
   ActivityIndicator,
+  Image,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useRouter } from 'expo-router';
 import { Building2, User, FileText, Lock, AlertCircle } from 'lucide-react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '@/contexts/AuthContext';
 import Colors from '@/constants/Colors';
 
@@ -82,12 +82,13 @@ export default function LoginScreen() {
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.header}>
-            <LinearGradient
-              colors={[Colors.primary, Colors.primaryDark]}
-              style={styles.logoContainer}
-            >
-              <Building2 size={48} color="#FFFFFF" />
-            </LinearGradient>
+            <Image
+              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/8gtp3xurxdqt9exz7kjwe' }}
+              style={styles.logoImage}
+              resizeMode="contain"
+              accessibilityLabel="Logo SST Asesores"
+              testID="company-logo"
+            />
             <Text style={styles.title}>SST Asesores</Text>
             <Text style={styles.subtitle}>Sistema de Capacitaciones</Text>
           </View>
@@ -241,6 +242,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 8,
+  },
+  logoImage: {
+    width: 180,
+    height: 120,
+    marginBottom: 16,
   },
   title: {
     fontSize: 28,
