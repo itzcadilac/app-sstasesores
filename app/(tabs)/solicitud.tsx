@@ -33,6 +33,9 @@ export default function SolicitudScreen() {
   const [contactoEmail, setContactoEmail] = useState('');
   const [observaciones, setObservaciones] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [cuposDisponibles, setCuposDisponibles] = useState<number | null>(null);
+  const [checkingCupos, setCheckingCupos] = useState<boolean>(false);
+  const [cuposError, setCuposError] = useState<string | null>(null);
 
   const tiposCapacitacion = [
     'Trabajo en Altura',
@@ -45,6 +48,23 @@ export default function SolicitudScreen() {
     'Comité de SST',
     'Otro',
   ];
+
+  const consultarCupos = async () => {
+    if (!tipoCapacitacion || !fechaSolicitada) return;
+    try {
+      setCheckingCupos(true);
+      setCuposError(null);
+      const { obtenerCuposDisponibles } = await import('@/services/capacitacionService');
+      const res = await obtenerCuposDisponibles({ tipoCapacitacion, fecha: fechaSolicitada, modalidad }, user?.token);
+      setCuposDisponibles(res.disponibles);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'No fue posible obtener disponibilidad';
+      setCuposError(msg);
+      setCuposDisponibles(null);
+    } finally {
+      setCheckingCupos(false);
+    }
+  };
 
   const handleSubmit = async () => {
     if (!tipoCapacitacion || !numeroParticipantes || !fechaSolicitada || !contactoNombre || !contactoTelefono) {
@@ -181,6 +201,7 @@ export default function SolicitudScreen() {
                 value={numeroParticipantes}
                 onChangeText={setNumeroParticipantes}
                 keyboardType="numeric"
+                testID="input-numero-participantes"
               />
             </View>
           </View>
@@ -193,9 +214,25 @@ export default function SolicitudScreen() {
                 style={styles.input}
                 placeholder="DD/MM/YYYY"
                 value={fechaSolicitada}
-                onChangeText={setFechaSolicitada}
+                onChangeText={(t) => { setFechaSolicitada(t); setCuposDisponibles(null); }}
+                onBlur={consultarCupos}
+                testID="input-fecha-solicitada"
               />
             </View>
+            {checkingCupos ? (
+              <View style={styles.cuposRow}>
+                <ActivityIndicator size="small" color={Colors.primary} />
+                <Text style={styles.cuposText}>Consultando cupos...</Text>
+              </View>
+            ) : cuposError ? (
+              <View style={styles.cuposRow}>
+                <Text style={[styles.cuposText, { color: Colors.error }]}>{cuposError}</Text>
+              </View>
+            ) : cuposDisponibles != null ? (
+              <View style={styles.cuposRow}>
+                <Text style={styles.cuposText}>Cupos disponibles: {cuposDisponibles}</Text>
+              </View>
+            ) : null}
           </View>
 
           <View style={styles.inputGroup}>
@@ -450,6 +487,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.text,
     minHeight: 100,
+  },
+  cuposRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 8,
+    paddingHorizontal: 4,
+  },
+  cuposText: {
+    fontSize: 12,
+    color: Colors.textSecondary,
   },
   submitButton: {
     backgroundColor: Colors.primary,

@@ -238,3 +238,32 @@ export async function buscarCapacitadosPorDocumento(ruc: string, documento: stri
     throw new Error('Error de conexión');
   }
 }
+
+export async function obtenerCuposDisponibles(params: { tipoCapacitacion: string; fecha: string; modalidad?: 'presencial' | 'virtual' | 'in-house' }, token?: string): Promise<{ disponibles: number }> {
+  try {
+    const search = new URLSearchParams({
+      tipo: params.tipoCapacitacion,
+      fecha: params.fecha,
+      ...(params.modalidad ? { modalidad: params.modalidad } : {}),
+    });
+    const url = `${API_BASE_URL}/capacitaciones/disponibilidad?${search.toString()}`;
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+      headers['x-auth-token'] = token;
+    }
+    const response = await fetch(url, { headers, cache: 'no-store', mode: 'cors' });
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`No se pudo obtener disponibilidad: ${response.status} - ${text}`);
+    }
+    const data = await response.json();
+    const disponibles = typeof (data as any)?.disponibles === 'number' ? (data as any).disponibles : parseInt(String((data as any)?.disponibles ?? '0'), 10);
+    return { disponibles: Number.isFinite(disponibles) ? disponibles : 0 };
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error('Error de conexión');
+  }
+}
