@@ -119,17 +119,23 @@ export default function BuscarScreen() {
               style={styles.searchInput}
               placeholder="Buscar por documento..."
               value={searchQuery}
-              onChangeText={setSearchQuery}
+              onChangeText={(t) => {
+                const cleaned = t.replace(/[^a-zA-Z0-9]/g, '');
+                setSearchQuery(cleaned);
+              }}
               onSubmitEditing={handleSearch}
               returnKeyType="search"
-              keyboardType="numeric"
-              maxLength={8}
+              autoCapitalize="none"
+              autoCorrect={false}
+              inputMode="text"
+              testID="buscar-input"
             />
           </View>
           <TouchableOpacity
             style={[styles.searchButton, isSearching && styles.searchButtonDisabled]}
             onPress={handleSearch}
             disabled={isSearching}
+            testID="buscar-button"
           >
             {isSearching ? (
               <ActivityIndicator color="#FFFFFF" size="small" />
