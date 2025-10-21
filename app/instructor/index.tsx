@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator
 import Colors from '@/constants/Colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQuery } from '@tanstack/react-query';
-import { BookOpenCheck, Users, ClipboardList, Download } from 'lucide-react-native';
+import { BookOpenCheck, Users, ClipboardList, Check } from 'lucide-react-native';
 import * as instructorService from '@/services/instructorService';
 import type { InstructorReportItem } from '@/services/instructorService';
 import * as WebBrowser from 'expo-web-browser';
@@ -92,15 +92,28 @@ export default function InstructorDashboard() {
 
       <View style={styles.list}>
         {reportsQuery.data?.map((r: InstructorReportItem) => (
-          <View key={r.id} style={styles.listItem} testID={`report-${r.id}`}>
-            <View style={styles.listTextWrap}>
-              <Text style={styles.listTitle} numberOfLines={1}>{r.titulo}</Text>
-              <Text style={styles.listMeta} numberOfLines={1}>{r.curso} • {r.fecha}</Text>
+          <View key={r.id} style={styles.reportCard} testID={`report-${r.id}`}>
+            <View style={styles.reportHeader}>
+              <Text style={styles.reportHeaderIcon}>▦</Text>
+              <Text style={styles.reportHeaderTitle}>Listado de Informes</Text>
             </View>
-            <TouchableOpacity style={styles.downloadBtn} onPress={() => handleDownload(r.id)} testID={`download-${r.id}`}>
-              <Download size={18} color="#fff" />
-              <Text style={styles.downloadText}>Descargar</Text>
-            </TouchableOpacity>
+
+            <View style={styles.reportBody}>
+              <Text style={styles.reportSectionTitle}>DATOS DEL INFORME</Text>
+              <Text style={styles.reportLine}><Text style={styles.reportLabel}>- ID: </Text>{r.id}{r.anio ? ` - ${r.anio}` : ''}</Text>
+              {!!r.documento && <Text style={styles.reportLine}><Text style={styles.reportLabel}>- Documento: </Text>{r.documento}</Text>}
+              {!!r.asunto && <Text style={styles.reportLine}><Text style={styles.reportLabel}>- Asunto: </Text>{r.asunto}</Text>}
+              {!!r.remitente && <Text style={styles.reportLine}><Text style={styles.reportLabel}>- Remitente: </Text>{r.remitente}</Text>}
+              {!!r.instructor && <Text style={styles.reportLine}><Text style={styles.reportLabel}>- Instructor: </Text>{r.instructor}</Text>}
+              {!!r.fecha && <Text style={styles.reportLine}><Text style={styles.reportLabel}>- Fecha: </Text>{r.fecha}</Text>}
+              {!!r.correoSolicitud && <Text style={styles.reportLine}><Text style={styles.reportLabel}>- Correo Solicitud: </Text>{r.correoSolicitud}</Text>}
+              {!!r.empresa && <Text style={styles.reportLine}><Text style={styles.reportLabel}>- Empresa: </Text>{r.empresa}</Text>}
+
+              <TouchableOpacity style={styles.generateBtn} onPress={() => handleDownload(r.id)} testID={`generar-${r.id}`}>
+                <Check size={18} color="#fff" />
+                <Text style={styles.generateText}>Generar Informe</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         ))}
 
@@ -142,12 +155,16 @@ const styles = StyleSheet.create({
   cardTitle: { fontSize: 13, color: Colors.textSecondary },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 },
   sectionTitle: { fontSize: 18, fontWeight: fontWeight600, color: Colors.text },
-  list: { backgroundColor: Colors.surface, borderRadius: 12, borderWidth: 1, borderColor: Colors.border },
-  listItem: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 12, borderBottomWidth: 1, borderBottomColor: Colors.borderLight, gap: 12 },
-  listTextWrap: { flex: 1 },
-  listTitle: { fontSize: 15, fontWeight: fontWeight600, color: Colors.text },
-  listMeta: { fontSize: 12, color: Colors.textSecondary, marginTop: 2 },
-  downloadBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: Colors.primary, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8 },
-  downloadText: { color: '#fff', fontSize: 12, fontWeight: fontWeight600 },
+  list: { gap: 12 },
+  reportCard: { backgroundColor: Colors.surface, borderRadius: 12, borderWidth: 1, borderColor: Colors.border, overflow: 'hidden' },
+  reportHeader: { backgroundColor: Colors.primaryDark, paddingVertical: 10, paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', gap: 8 },
+  reportHeaderIcon: { color: '#fff', fontSize: 14 },
+  reportHeaderTitle: { color: '#fff', fontSize: 14, fontWeight: fontWeight600 },
+  reportBody: { padding: 12, borderTopWidth: 1, borderTopColor: Colors.borderLight },
+  reportSectionTitle: { fontSize: 13, fontWeight: fontWeight700, color: Colors.text, marginBottom: 8 },
+  reportLine: { fontSize: 13, color: Colors.text, lineHeight: 20 },
+  reportLabel: { fontWeight: fontWeight700 },
+  generateBtn: { marginTop: 12, alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: Colors.primaryDark, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 8 },
+  generateText: { color: '#fff', fontSize: 13, fontWeight: fontWeight600 },
   emptyText: { padding: 16, textAlign: 'center', color: Colors.textSecondary },
 });

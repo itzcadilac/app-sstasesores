@@ -14,6 +14,13 @@ export interface InstructorReportItem {
   curso: string;
   fecha: string;
   url?: string;
+  anio?: string;
+  documento?: string;
+  asunto?: string;
+  remitente?: string;
+  instructor?: string;
+  correoSolicitud?: string;
+  empresa?: string;
 }
 
 export async function getStats(token: string): Promise<InstructorStats> {
@@ -61,6 +68,13 @@ export async function getRecentReports(params: { limit?: number }, token: string
       curso: String(it.curso ?? it.course ?? it.capacitacion ?? 'Curso'),
       fecha: String(it.fecha ?? it.createdAt ?? it.fecha_emision ?? ''),
       url: typeof it.url === 'string' ? it.url : undefined,
+      anio: typeof it.anio === 'string' ? it.anio : (it.year ? String(it.year) : undefined),
+      documento: typeof it.documento === 'string' ? it.documento : (it.document ? String(it.document) : undefined),
+      asunto: typeof it.asunto === 'string' ? it.asunto : (it.subject ? String(it.subject) : undefined),
+      remitente: typeof it.remitente === 'string' ? it.remitente : (it.sender ? String(it.sender) : undefined),
+      instructor: typeof it.instructor === 'string' ? it.instructor : (it.instructorNombre ? String(it.instructorNombre) : undefined),
+      correoSolicitud: typeof it.correoSolicitud === 'string' ? it.correoSolicitud : (it.correo || it.email ? String(it.correo || it.email) : undefined),
+      empresa: typeof it.empresa === 'string' ? it.empresa : (it.company ? String(it.company) : undefined),
     }));
   } catch {
     return [];
