@@ -10,26 +10,39 @@ SplashScreen.preventAutoHideAsync();
 const queryClient = new QueryClient();
 
 function RootLayoutNav() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, isInstructor } = useAuth();
   const segments = useSegments();
   const router = useRouter();
 
   useEffect(() => {
     if (isLoading) return;
 
-    const inAuthGroup = segments[0] === '(tabs)';
+    const inTabsGroup = segments[0] === '(tabs)';
+    const inInstructorGroup = segments[0] === 'instructor';
 
-    if (!isAuthenticated && inAuthGroup) {
-      router.replace('/login');
-    } else if (isAuthenticated && !inAuthGroup) {
-      router.replace('/(tabs)');
+    if (!isAuthenticated) {
+      if (inTabsGroup || inInstructorGroup) {
+        router.replace('/login');
+      }
+      return;
     }
-  }, [isAuthenticated, segments, isLoading, router]);
+
+    if (isInstructor) {
+      if (!inInstructorGroup) {
+        router.replace('/instructor');
+      }
+    } else {
+      if (!inTabsGroup) {
+        router.replace('/(tabs)');
+      }
+    }
+  }, [isAuthenticated, isInstructor, segments, isLoading, router]);
 
   return (
     <Stack screenOptions={{ headerBackTitle: "Atrás" }}>
       <Stack.Screen name="login" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen name="instructor" options={{ headerShown: false }} />
     </Stack>
   );
 }

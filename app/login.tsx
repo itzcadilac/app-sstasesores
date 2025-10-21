@@ -70,7 +70,7 @@ export default function LoginScreen() {
     const success = await loginInstructor({ username, password: instrPassword });
     setIsLoading(false);
     if (success) {
-      router.replace('/(tabs)');
+      router.replace('/instructor');
     }
   };
 
