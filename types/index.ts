@@ -1,4 +1,4 @@
-export type UserType = 'empresa' | 'personal';
+export type UserType = 'empresa' | 'personal' | 'instructor';
 
 export interface User {
   id: string;
@@ -8,6 +8,7 @@ export interface User {
   documento?: string;
   empresa?: string;
   ruc?: string;
+  username?: string;
   token: string;
 }
 
@@ -19,6 +20,11 @@ export interface LoginCredentials {
 
 export interface PersonalLoginCredentials {
   documento: string;
+}
+
+export interface InstructorLoginCredentials {
+  username: string;
+  password: string;
 }
 
 export interface SolicitudCapacitacion {

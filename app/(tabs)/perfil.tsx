@@ -9,7 +9,7 @@ const fontWeight700 = '700' as const;
 const fontWeight600 = '600' as const;
 
 export default function PerfilScreen() {
-  const { user, isEmpresa } = useAuth();
+  const { user, isEmpresa, isInstructor } = useAuth();
   const [showPwdModal, setShowPwdModal] = useState<boolean>(false);
   const [currentPassword, setCurrentPassword] = useState<string>('');
   const [newPassword, setNewPassword] = useState<string>('');
@@ -73,7 +73,7 @@ export default function PerfilScreen() {
         </View>
         <Text style={styles.name}>{user?.nombre}</Text>
         <Text style={styles.type}>
-          {isEmpresa ? 'Cuenta Empresarial' : 'Cuenta Personal'}
+          {isEmpresa ? 'Cuenta Empresarial' : isInstructor ? 'Cuenta Instructor' : 'Cuenta Capacitados'}
         </Text>
       </View>
 

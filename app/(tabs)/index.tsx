@@ -16,7 +16,7 @@ interface EstadisticasEmpresa {
 }
 
 export default function HomeScreen() {
-  const { user, isEmpresa, isPersonal } = useAuth();
+  const { user, isEmpresa, isPersonal, isInstructor } = useAuth();
   const router = useRouter();
   const [estadisticas, setEstadisticas] = useState<EstadisticasEmpresa>({ cantidadSolicitudes: 0, capacitados: 0 });
   const [isLoadingStats, setIsLoadingStats] = useState(false);
@@ -103,7 +103,7 @@ export default function HomeScreen() {
               <Text style={styles.statLabel}>Capacitados</Text>
             </View>
           </>
-        ) : (
+        ) : isPersonal ? (
           <>
             <View style={styles.statCard}>
               <View style={[styles.statIcon, { backgroundColor: Colors.primary + '20' }]}>
@@ -117,6 +117,8 @@ export default function HomeScreen() {
               <Text style={styles.statLabel}>Capacitaciones</Text>
             </View>
           </>
+        ) : (
+          <View style={{ flex: 1 }} />
         )}
       </View>
 
@@ -145,7 +147,7 @@ export default function HomeScreen() {
               </LinearGradient>
             </TouchableOpacity>
           </View>
-        ) : (
+        ) : isPersonal ? (
           <View style={styles.quickActions}>
             <TouchableOpacity testID="go-consulta-capacitaciones" style={styles.actionCard} onPress={() => router.push('/(tabs)/consulta-capacitaciones')}>
               <LinearGradient
@@ -157,7 +159,7 @@ export default function HomeScreen() {
               </LinearGradient>
             </TouchableOpacity>
           </View>
-        )}
+        ) : null}
       </View>
 
       <View style={styles.section}>

@@ -1,7 +1,7 @@
 import createContextHook from '@nkzw/create-context-hook';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { User, LoginCredentials, PersonalLoginCredentials } from '@/types';
+import { User, LoginCredentials, PersonalLoginCredentials, InstructorLoginCredentials } from '@/types';
 import * as authService from '@/services/authService';
 
 const AUTH_STORAGE_KEY = '@sst_auth_user';
@@ -57,6 +57,23 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     }
   }, []);
 
+  const loginInstructor = useCallback(async (credentials: InstructorLoginCredentials): Promise<boolean> => {
+    try {
+      setError(null);
+      setIsLoading(true);
+      const userData = await authService.loginInstructor(credentials);
+      setUser(userData);
+      await AsyncStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userData));
+      return true;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Error al iniciar sesión';
+      setError(errorMessage);
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   const logout = useCallback(async () => {
     try {
       setUser(null);
@@ -77,10 +94,13 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     error,
     login,
     loginPersonal,
+    loginInstructor,
     logout,
     clearError,
     isAuthenticated: !!user,
     isEmpresa: user?.tipo === 'empresa',
     isPersonal: user?.tipo === 'personal',
-  }), [user, isLoading, error, login, loginPersonal, logout, clearError]);
+    isCapacitados: user?.tipo === 'personal',
+    isInstructor: user?.tipo === 'instructor',
+  }), [user, isLoading, error, login, loginPersonal, loginInstructor, logout, clearError]);
 });

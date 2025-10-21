@@ -14,11 +14,11 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useRouter } from 'expo-router';
-import { Building2, User, FileText, Lock, AlertCircle } from 'lucide-react-native';
+import { Building2, User, FileText, Lock, AlertCircle, GraduationCap } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import Colors from '@/constants/Colors';
 
-type LoginType = 'empresa' | 'personal';
+type LoginType = 'empresa' | 'personal' | 'instructor';
 
 const fontWeight = '700' as const;
 const fontWeight600 = '600' as const;
@@ -26,13 +26,15 @@ const fontWeight600 = '600' as const;
 export default function LoginScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { login, loginPersonal, error, clearError } = useAuth();
+  const { login, loginPersonal, loginInstructor, error, clearError } = useAuth();
   
   const [loginType, setLoginType] = useState<LoginType>('empresa');
   const [ruc, setRuc] = useState('');
   const [password, setPassword] = useState('');
   const [documento, setDocumento] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [username, setUsername] = useState('');
+  const [instrPassword, setInstrPassword] = useState('');
 
   const handleEmpresaLogin = async () => {
     if (!ruc || !password) {
@@ -62,12 +64,24 @@ export default function LoginScreen() {
     }
   };
 
+  const handleInstructorLogin = async () => {
+    if (!username || !instrPassword) return;
+    setIsLoading(true);
+    const success = await loginInstructor({ username, password: instrPassword });
+    setIsLoading(false);
+    if (success) {
+      router.replace('/(tabs)');
+    }
+  };
+
   const handleSubmit = () => {
     clearError();
     if (loginType === 'empresa') {
       handleEmpresaLogin();
-    } else {
+    } else if (loginType === 'personal') {
       handlePersonalLogin();
+    } else {
+      handleInstructorLogin();
     }
   };
 
@@ -132,7 +146,28 @@ export default function LoginScreen() {
                   loginType === 'personal' && styles.tabTextActive,
                 ]}
               >
-                Personal
+                Capacitados
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.tab, loginType === 'instructor' && styles.tabActive]}
+              onPress={() => {
+                setLoginType('instructor');
+                clearError();
+              }}
+            >
+              <GraduationCap
+                size={20}
+                color={loginType === 'instructor' ? Colors.primary : Colors.textSecondary}
+              />
+              <Text
+                style={[
+                  styles.tabText,
+                  loginType === 'instructor' && styles.tabTextActive,
+                ]}
+              >
+                Instructores
               </Text>
             </TouchableOpacity>
           </View>
@@ -174,7 +209,7 @@ export default function LoginScreen() {
                   />
                 </View>
               </>
-            ) : (
+            ) : loginType === 'personal' ? (
               <View style={styles.inputContainer}>
                 <User size={20} color={Colors.textSecondary} style={styles.inputIcon} />
                 <TextInput
@@ -183,10 +218,37 @@ export default function LoginScreen() {
                   placeholderTextColor={Colors.textLight}
                   value={documento}
                   onChangeText={setDocumento}
-                  keyboardType="numeric"
-                  maxLength={12}
+                  autoCapitalize="characters"
+                  inputMode="text"
                 />
               </View>
+            ) : (
+              <>
+                <View style={styles.inputContainer}>
+                  <User size={20} color={Colors.textSecondary} style={styles.inputIcon} />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Usuario"
+                    placeholderTextColor={Colors.textLight}
+                    value={username}
+                    onChangeText={setUsername}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                  />
+                </View>
+                <View style={styles.inputContainer}>
+                  <Lock size={20} color={Colors.textSecondary} style={styles.inputIcon} />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Contraseña"
+                    placeholderTextColor={Colors.textLight}
+                    value={instrPassword}
+                    onChangeText={setInstrPassword}
+                    secureTextEntry
+                    autoCapitalize="none"
+                  />
+                </View>
+              </>
             )}
 
             <TouchableOpacity

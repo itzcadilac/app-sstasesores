@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import Colors from "@/constants/Colors";
 
 export default function TabLayout() {
-  const { isEmpresa, logout } = useAuth();
+  const { isEmpresa, isInstructor, logout } = useAuth();
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -54,7 +54,7 @@ export default function TabLayout() {
           }}
         />
       )}
-      {!isEmpresa && (
+      {!isEmpresa && !isInstructor && (
         <Tabs.Screen
           name="consulta-capacitaciones"
           options={{
