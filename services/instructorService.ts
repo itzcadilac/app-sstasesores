@@ -1,4 +1,4 @@
-import { User } from '@/types';
+import { Platform } from 'react-native';
 
 const API_BASE_URL = 'https://software.sstasesores.pe/api';
 
@@ -9,19 +9,17 @@ export interface InstructorStats {
 }
 
 export interface InstructorReportItem {
-  // Display fields
-  titulo: string; // titulodoc
-  anioNombre?: string; // nombanio
-  documentoTitulo?: string; // titulodocdad
-  asunto?: string; // asuntodad
+  titulo: string;
+  anioNombre?: string;
+  documentoTitulo?: string;
+  asunto?: string;
   remitente?: string;
   instructor?: string;
   fecha: string;
   correoSolicitud?: string;
   empresa?: string;
-  // Internal ids used for actions
-  documentoId?: string; // iddocumento_cuerpo
-  anioId?: string; // idanio
+  documentoId?: string;
+  anioId?: string;
 }
 
 export async function getStats(token: string, idcapacitador?: string): Promise<InstructorStats> {
@@ -29,7 +27,7 @@ export async function getStats(token: string, idcapacitador?: string): Promise<I
   if (idcapacitador) urlObj.searchParams.set('idcapacitador', String(idcapacitador));
   const res = await fetch(urlObj.toString(), {
     headers: {
-      'Authorization': `Bearer ${token}`,
+      Authorization: `Bearer ${token}`,
       'x-auth-token': token,
     },
   });
@@ -56,7 +54,7 @@ export async function getRecentReports(params: { limit?: number }, token: string
   const url = `${API_BASE_URL}/listar-solicitudes-instructores`;
   const res = await fetch(url, {
     headers: {
-      'Authorization': `Bearer ${token}`,
+      Authorization: `Bearer ${token}`,
       'x-auth-token': token,
     },
   });
@@ -94,15 +92,31 @@ export async function getRecentReports(params: { limit?: number }, token: string
           anioId,
         } as InstructorReportItem;
       });
-  } catch (e) {
+  } catch {
     return [];
   }
 }
 
-export function getReportDownloadUrlByIds(documentoId?: string, anioId?: string, token?: string): string {
+export function getReportDownloadUrlByIds(documentoId?: string, anioId?: string): string {
   const base = new URL(`${API_BASE_URL}/informe-instructor`);
   if (documentoId) base.searchParams.set('iddocumento_cuerpo', documentoId);
   if (anioId) base.searchParams.set('idanio', anioId);
-  if (token) base.searchParams.set('token', token);
   return base.toString();
+}
+
+export async function fetchReportPdf(documentoId: string, anioId: string, token: string): Promise<Blob> {
+  const url = getReportDownloadUrlByIds(documentoId, anioId);
+  const res = await fetch(url, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'x-auth-token': token,
+    },
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(text || `Error ${res.status}`);
+  }
+  const blob = await res.blob();
+  return blob;
 }

@@ -1,12 +1,11 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Platform, Linking } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Platform } from 'react-native';
 import Colors from '@/constants/Colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import { BookOpenCheck, Users, ClipboardList, Check } from 'lucide-react-native';
 import * as instructorService from '@/services/instructorService';
 import type { InstructorReportItem } from '@/services/instructorService';
-import * as WebBrowser from 'expo-web-browser';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const fontWeight700 = '700' as const;
@@ -62,17 +61,24 @@ export default function InstructorDashboard() {
 
   const handleDownload = async (documentoId?: string, anioId?: string) => {
     try {
-      const url = instructorService.getReportDownloadUrlByIds(documentoId, anioId, token);
+      if (!documentoId || !anioId) return;
       if (Platform.OS === 'web') {
-        window.open(url, '_blank');
+        const blob = await instructorService.fetchReportPdf(documentoId, anioId, token);
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `informe-${documentoId}-${anioId}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
         return;
       }
-      const result = await WebBrowser.openBrowserAsync(url);
-      if (result.type === 'cancel') {
-        await Linking.openURL(url);
-      }
+      await instructorService.fetchReportPdf(documentoId, anioId, token);
+      alert('Informe generado. Revisa tu bandeja de descargas o abre desde web para descargar el PDF.');
     } catch (e) {
       console.log('Error al descargar reporte', e);
+      alert('No se pudo generar el informe. Intenta de nuevo.');
     }
   };
 
