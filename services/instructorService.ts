@@ -9,18 +9,19 @@ export interface InstructorStats {
 }
 
 export interface InstructorReportItem {
-  id: string;
-  titulo: string;
-  curso: string;
-  fecha: string;
-  url?: string;
-  anio?: string;
-  documento?: string;
-  asunto?: string;
+  // Display fields
+  titulo: string; // titulodoc
+  anioNombre?: string; // nombanio
+  documentoTitulo?: string; // titulodocdad
+  asunto?: string; // asuntodad
   remitente?: string;
   instructor?: string;
+  fecha: string;
   correoSolicitud?: string;
   empresa?: string;
+  // Internal ids used for actions
+  documentoId?: string; // iddocumento_cuerpo
+  anioId?: string; // idanio
 }
 
 export async function getStats(token: string): Promise<InstructorStats> {
@@ -64,29 +65,29 @@ export async function getRecentReports(params: { limit?: number }, token: string
     return (arr || [])
       .slice(0, params.limit ?? 50)
       .map((it) => {
-        const id = it.idanio ?? it.id ?? it.codigo ?? null;
         const titulo = it.titulodoc ?? it.titulo ?? 'Informe';
-        const curso = it.temariodad ?? it.curso ?? 'Curso';
         const fecha = it.fecha ?? it.fecharesultados ?? '';
-        const documento = it.iddocumento_cuerpo ?? it.documento ?? undefined;
+        const documentoId = it.iddocumento_cuerpo ? String(it.iddocumento_cuerpo) : undefined;
+        const documentoTitulo = typeof it.titulodocdad === 'string' ? it.titulodocdad : undefined;
         const asunto = it.asuntodad ?? it.asunto ?? undefined;
         const remitente = it.remitente ?? undefined;
         const instructor = it.instructor ?? undefined;
         const correoSolicitud = it.correosolicitud ?? undefined;
         const empresa = it.razonsoc ?? undefined;
-        const anio = it.nombanio ? String(it.nombanio) : undefined;
+        const anioNombre = it.nombanio ? String(it.nombanio) : undefined;
+        const anioId = it.idanio ? String(it.idanio) : undefined;
         return {
-          id: String(id ?? Math.random().toString(36).slice(2)),
           titulo: String(titulo),
-          curso: String(curso),
           fecha: String(fecha),
-          documento: typeof documento === 'string' ? documento : undefined,
+          documentoId,
+          documentoTitulo,
           asunto: typeof asunto === 'string' ? asunto : undefined,
           remitente: typeof remitente === 'string' ? remitente : undefined,
           instructor: typeof instructor === 'string' ? instructor : undefined,
           correoSolicitud: typeof correoSolicitud === 'string' ? correoSolicitud : undefined,
           empresa: typeof empresa === 'string' ? empresa : undefined,
-          anio,
+          anioNombre,
+          anioId,
         } as InstructorReportItem;
       });
   } catch (e) {
@@ -94,8 +95,17 @@ export async function getRecentReports(params: { limit?: number }, token: string
   }
 }
 
-export function getReportDownloadUrl(reportId: string, token: string): string {
-  const url = new URL(`${API_BASE_URL}/instructor/reports/${encodeURIComponent(reportId)}/download`);
-  url.searchParams.set('token', token);
-  return url.toString();
+export function getReportDownloadUrlByIds(documentoId?: string, anioId?: string, token?: string): string {
+  if (documentoId && anioId) {
+    const url = new URL(`${API_BASE_URL}/cyedocs.php`);
+    url.searchParams.set('id', documentoId);
+    url.searchParams.set('idanio', anioId);
+    if (token) url.searchParams.set('token', token);
+    return url.toString();
+  }
+  const fallback = new URL(`${API_BASE_URL}/instructor/reports/download`);
+  if (documentoId) fallback.searchParams.set('id', documentoId);
+  if (anioId) fallback.searchParams.set('idanio', anioId);
+  if (token) fallback.searchParams.set('token', token);
+  return fallback.toString();
 }

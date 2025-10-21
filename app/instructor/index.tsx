@@ -60,9 +60,9 @@ export default function InstructorDashboard() {
     },
   ]), [statsQuery.data]);
 
-  const handleDownload = async (reportId: string) => {
+  const handleDownload = async (documentoId?: string, anioId?: string) => {
     try {
-      const url = instructorService.getReportDownloadUrl(reportId, token);
+      const url = instructorService.getReportDownloadUrlByIds(documentoId, anioId, token);
       if (Platform.OS === 'web') {
         window.open(url, '_blank');
         return;
@@ -99,7 +99,7 @@ export default function InstructorDashboard() {
 
       <View style={styles.list}>
         {reportsQuery.data?.slice(0, visibleCount).map((r: InstructorReportItem) => (
-          <View key={r.id} style={styles.reportCard} testID={`report-${r.id}`}>
+          <View key={`${r.documentoId ?? r.titulo}-${r.anioId ?? r.anioNombre}`} style={styles.reportCard} testID={`report-${r.documentoId ?? r.titulo}`}>
             <View style={styles.reportHeader}>
               <Text style={styles.reportHeaderIcon}>▦</Text>
               <Text style={styles.reportHeaderTitle}>Listado de Informes</Text>
@@ -107,8 +107,8 @@ export default function InstructorDashboard() {
 
             <View style={styles.reportBody}>
               <Text style={styles.reportSectionTitle}>DATOS DEL INFORME</Text>
-              <Text style={styles.reportLine}><Text style={styles.reportLabel}>- ID: </Text>{r.id}{r.anio ? ` - ${r.anio}` : ''}</Text>
-              {!!r.documento && <Text style={styles.reportLine}><Text style={styles.reportLabel}>- Documento: </Text>{r.documento}</Text>}
+              <Text style={styles.reportLine}><Text style={styles.reportLabel}>- ID: </Text>{r.titulo}{r.anioNombre ? ` - ${r.anioNombre}` : ''}</Text>
+              {!!r.documentoTitulo && <Text style={styles.reportLine}><Text style={styles.reportLabel}>- Documento: </Text>{r.documentoTitulo}</Text>}
               {!!r.asunto && <Text style={styles.reportLine}><Text style={styles.reportLabel}>- Asunto: </Text>{r.asunto}</Text>}
               {!!r.remitente && <Text style={styles.reportLine}><Text style={styles.reportLabel}>- Remitente: </Text>{r.remitente}</Text>}
               {!!r.instructor && <Text style={styles.reportLine}><Text style={styles.reportLabel}>- Instructor: </Text>{r.instructor}</Text>}
@@ -116,7 +116,7 @@ export default function InstructorDashboard() {
               {!!r.correoSolicitud && <Text style={styles.reportLine}><Text style={styles.reportLabel}>- Correo Solicitud: </Text>{r.correoSolicitud}</Text>}
               {!!r.empresa && <Text style={styles.reportLine}><Text style={styles.reportLabel}>- Empresa: </Text>{r.empresa}</Text>}
 
-              <TouchableOpacity style={styles.generateBtn} onPress={() => handleDownload(r.id)} testID={`generar-${r.id}`}>
+              <TouchableOpacity style={styles.generateBtn} onPress={() => handleDownload(r.documentoId, r.anioId)} testID={`generar-${r.documentoId ?? 'sin-id'}`}>
                 <Check size={18} color="#fff" />
                 <Text style={styles.generateText}>Generar Informe</Text>
               </TouchableOpacity>
