@@ -107,89 +107,91 @@ export default function LoginScreen() {
             <Text style={styles.subtitle}>Sistema de Capacitaciones</Text>
           </View>
 
-          <View style={styles.tabContainer}>
+          <View
+            style={styles.optionGroup}
+            accessibilityRole="radiogroup"
+            accessibilityLabel="Tipo de usuario"
+            testID="login-type-group"
+          >
             <TouchableOpacity
-              style={[styles.tab, loginType === 'empresa' && styles.tabActive]}
+              style={[styles.optionCard, loginType === 'empresa' && styles.optionSelected]}
               onPress={() => {
                 setLoginType('empresa');
                 clearError();
               }}
-              accessibilityRole="button"
-              accessibilityLabel="Seleccionar Empresa"
-              testID="tab-empresa"
+              accessibilityRole="radio"
+              accessibilityState={{ selected: loginType === 'empresa' }}
+              accessibilityLabel="Empresa"
+              testID="opt-empresa"
             >
-              <Building2
-                size={20}
-                color={loginType === 'empresa' ? Colors.primary : Colors.textSecondary}
-              />
-              <Text
-                style={[
-                  styles.tabText,
-                  loginType === 'empresa' && styles.tabTextActive,
-                ]}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-                allowFontScaling={false}
-                testID="tab-empresa-label"
-              >
-                Empresa
-              </Text>
+              <View style={styles.optionLeft}>
+                <View style={[styles.radioOuter, loginType === 'empresa' && styles.radioOuterActive]}
+                  testID="opt-empresa-radio"
+                >
+                  {loginType === 'empresa' ? <View style={styles.radioInner} /> : null}
+                </View>
+                <Building2 size={22} color={loginType === 'empresa' ? Colors.primary : Colors.textSecondary} />
+              </View>
+              <View style={styles.optionContent}>
+                <Text style={[styles.optionTitle, loginType === 'empresa' && styles.optionTitleActive]}
+                  numberOfLines={1}
+                >Empresa</Text>
+                <Text style={styles.optionDesc} numberOfLines={2}>Acceso para empresas</Text>
+              </View>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.tab, loginType === 'personal' && styles.tabActive]}
+              style={[styles.optionCard, loginType === 'personal' && styles.optionSelected]}
               onPress={() => {
                 setLoginType('personal');
                 clearError();
               }}
-              accessibilityRole="button"
-              accessibilityLabel="Seleccionar Capacitados"
-              testID="tab-personal"
+              accessibilityRole="radio"
+              accessibilityState={{ selected: loginType === 'personal' }}
+              accessibilityLabel="Capacitados"
+              testID="opt-personal"
             >
-              <User
-                size={20}
-                color={loginType === 'personal' ? Colors.primary : Colors.textSecondary}
-              />
-              <Text
-                style={[
-                  styles.tabText,
-                  loginType === 'personal' && styles.tabTextActive,
-                ]}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-                allowFontScaling={false}
-                testID="tab-personal-label"
-              >
-                Capacitados
-              </Text>
+              <View style={styles.optionLeft}>
+                <View style={[styles.radioOuter, loginType === 'personal' && styles.radioOuterActive]}
+                  testID="opt-personal-radio"
+                >
+                  {loginType === 'personal' ? <View style={styles.radioInner} /> : null}
+                </View>
+                <User size={22} color={loginType === 'personal' ? Colors.primary : Colors.textSecondary} />
+              </View>
+              <View style={styles.optionContent}>
+                <Text style={[styles.optionTitle, loginType === 'personal' && styles.optionTitleActive]}
+                  numberOfLines={1}
+                >Capacitados</Text>
+                <Text style={styles.optionDesc} numberOfLines={2}>Consulta tus capacitaciones</Text>
+              </View>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.tab, loginType === 'instructor' && styles.tabActive]}
+              style={[styles.optionCard, loginType === 'instructor' && styles.optionSelected]}
               onPress={() => {
                 setLoginType('instructor');
                 clearError();
               }}
-              accessibilityRole="button"
-              accessibilityLabel="Seleccionar Instructores"
-              testID="tab-instructor"
+              accessibilityRole="radio"
+              accessibilityState={{ selected: loginType === 'instructor' }}
+              accessibilityLabel="Instructores"
+              testID="opt-instructor"
             >
-              <GraduationCap
-                size={20}
-                color={loginType === 'instructor' ? Colors.primary : Colors.textSecondary}
-              />
-              <Text
-                style={[
-                  styles.tabText,
-                  loginType === 'instructor' && styles.tabTextActive,
-                ]}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-                allowFontScaling={false}
-                testID="tab-instructor-label"
-              >
-                Instructores
-              </Text>
+              <View style={styles.optionLeft}>
+                <View style={[styles.radioOuter, loginType === 'instructor' && styles.radioOuterActive]}
+                  testID="opt-instructor-radio"
+                >
+                  {loginType === 'instructor' ? <View style={styles.radioInner} /> : null}
+                </View>
+                <GraduationCap size={22} color={loginType === 'instructor' ? Colors.primary : Colors.textSecondary} />
+              </View>
+              <View style={styles.optionContent}>
+                <Text style={[styles.optionTitle, loginType === 'instructor' && styles.optionTitleActive]}
+                  numberOfLines={1}
+                >Instructores</Text>
+                <Text style={styles.optionDesc} numberOfLines={2}>Gestión de cursos</Text>
+              </View>
             </TouchableOpacity>
           </View>
 
@@ -341,43 +343,68 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.textSecondary,
   },
-  tabContainer: {
-    flexDirection: 'row',
-    backgroundColor: Colors.surface,
-    borderRadius: 12,
-    padding: 4,
+  optionGroup: {
+    gap: 10,
     marginBottom: 24,
-    shadowColor: Colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-    alignItems: 'stretch',
   },
-  tab: {
-    flex: 1,
+  optionCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    gap: 6,
-    minHeight: 48,
+    backgroundColor: Colors.surface,
+    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    shadowColor: Colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
   },
-  tabActive: {
-    backgroundColor: Colors.primaryLight + '20',
+  optionSelected: {
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primaryLight + '15',
   },
-  tabText: {
-    fontSize: Platform.OS === 'android' ? 14 : 16,
-    lineHeight: Platform.OS === 'android' ? 18 : 20,
+  optionLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginRight: 12,
+  },
+  optionContent: {
+    flex: 1,
+    gap: 2,
+  },
+  optionTitle: {
+    fontSize: 16,
     fontWeight: fontWeight600,
-    color: Colors.textSecondary,
-    includeFontPadding: false,
-    textAlignVertical: 'center',
+    color: Colors.text,
   },
-  tabTextActive: {
+  optionTitleActive: {
     color: Colors.primary,
+  },
+  optionDesc: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+  },
+  radioOuter: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    borderWidth: 2,
+    borderColor: Colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  radioOuterActive: {
+    borderColor: Colors.primary,
+  },
+  radioInner: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: Colors.primary,
   },
   errorContainer: {
     flexDirection: 'row',
