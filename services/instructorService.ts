@@ -96,16 +96,9 @@ export async function getRecentReports(params: { limit?: number }, token: string
 }
 
 export function getReportDownloadUrlByIds(documentoId?: string, anioId?: string, token?: string): string {
-  if (documentoId && anioId) {
-    const url = new URL(`${API_BASE_URL}/cyedocs.php`);
-    url.searchParams.set('id', documentoId);
-    url.searchParams.set('idanio', anioId);
-    if (token) url.searchParams.set('token', token);
-    return url.toString();
-  }
-  const fallback = new URL(`${API_BASE_URL}/instructor/reports/download`);
-  if (documentoId) fallback.searchParams.set('id', documentoId);
-  if (anioId) fallback.searchParams.set('idanio', anioId);
-  if (token) fallback.searchParams.set('token', token);
-  return fallback.toString();
+  const base = new URL(`${API_BASE_URL}/informe-instructor`);
+  if (documentoId) base.searchParams.set('iddocumento_cuerpo', documentoId);
+  if (anioId) base.searchParams.set('idanio', anioId);
+  if (token) base.searchParams.set('token', token);
+  return base.toString();
 }
