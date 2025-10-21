@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Platform, Linking } from 'react-native';
 import Colors from '@/constants/Colors';
 import { useAuth } from '@/contexts/AuthContext';
@@ -25,9 +25,16 @@ export default function InstructorDashboard() {
 
   const reportsQuery = useQuery({
     queryKey: ['instructor','reports','latest', user?.id, token],
-    queryFn: () => instructorService.getRecentReports({ limit: 5 }, token),
+    // Fetch up to 50 from backend, paginate locally by 5
+    queryFn: () => instructorService.getRecentReports({ limit: 50 }, token),
     enabled: !!token,
   });
+
+  const [visibleCount, setVisibleCount] = useState<number>(5);
+
+  useEffect(() => {
+    setVisibleCount(5);
+  }, [user?.id]);
 
   const cards = useMemo(() => ([
     {
@@ -91,7 +98,7 @@ export default function InstructorDashboard() {
       </View>
 
       <View style={styles.list}>
-        {reportsQuery.data?.map((r: InstructorReportItem) => (
+        {reportsQuery.data?.slice(0, visibleCount).map((r: InstructorReportItem) => (
           <View key={r.id} style={styles.reportCard} testID={`report-${r.id}`}>
             <View style={styles.reportHeader}>
               <Text style={styles.reportHeaderIcon}>▦</Text>
@@ -119,6 +126,32 @@ export default function InstructorDashboard() {
 
         {(!reportsQuery.isLoading && (reportsQuery.data?.length ?? 0) === 0) && (
           <Text style={styles.emptyText}>No hay informes recientes</Text>
+        )}
+
+        {reportsQuery.data && reportsQuery.data.length > 0 && (
+          <View style={styles.pagination} testID="reports-pagination">
+            <Text style={styles.paginationText}>
+              Mostrando {Math.min(visibleCount, reportsQuery.data.length)} de {reportsQuery.data.length}
+            </Text>
+            <View style={styles.paginationButtons}>
+              <TouchableOpacity
+                onPress={() => setVisibleCount((c) => Math.max(5, c - 5))}
+                disabled={visibleCount <= 5}
+                style={[styles.pageBtn, visibleCount <= 5 ? styles.pageBtnDisabled : undefined]}
+                testID="reports-prev"
+              >
+                <Text style={styles.pageBtnText}>Ver menos</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setVisibleCount((c) => Math.min((reportsQuery.data?.length ?? 0), c + 5))}
+                disabled={visibleCount >= (reportsQuery.data?.length ?? 0)}
+                style={[styles.pageBtn, visibleCount >= (reportsQuery.data?.length ?? 0) ? styles.pageBtnDisabled : undefined]}
+                testID="reports-next"
+              >
+                <Text style={styles.pageBtnText}>Ver más</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         )}
       </View>
     </ScrollView>
@@ -167,4 +200,10 @@ const styles = StyleSheet.create({
   generateBtn: { marginTop: 12, alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: Colors.primaryDark, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 8 },
   generateText: { color: '#fff', fontSize: 13, fontWeight: fontWeight600 },
   emptyText: { padding: 16, textAlign: 'center', color: Colors.textSecondary },
+  pagination: { marginTop: 8, paddingVertical: 8, alignItems: 'center', gap: 8 },
+  paginationText: { fontSize: 12, color: Colors.textSecondary },
+  paginationButtons: { flexDirection: 'row', gap: 10 },
+  pageBtn: { backgroundColor: Colors.primaryDark, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8 },
+  pageBtnDisabled: { backgroundColor: Colors.border },
+  pageBtnText: { color: '#fff', fontSize: 13, fontWeight: fontWeight600 },
 });
