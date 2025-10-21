@@ -134,16 +134,25 @@ export async function loginInstructor(credentials: InstructorLoginCredentials): 
     }
 
     const data = await response.json();
-    const possibleToken = (data && (data.token ?? data.jwt ?? data.access_token ?? (data.user ? data.user.token : undefined))) as string | undefined;
+
+    // Expected backend shape:
+    // { user: { id: string, tipo: 'instructor', nombre_completo: string, usuario: string }, token: string }
+    const userObj = (data?.user ?? {}) as Record<string, unknown>;
+    const id = String((userObj?.id ?? (data as any)?.id ?? credentials.username ?? 'instructor'));
+    const nombreCompleto = String(
+      (userObj as any).nombre_completo ?? (data as any).nombre_completo ?? (userObj as any).nombre ?? (data as any).nombre ?? 'Instructor'
+    );
+    const usuario = String((userObj as any).usuario ?? credentials.username ?? 'instructor');
+
+    const possibleToken = (data && (data.token ?? data.jwt ?? data.access_token ?? (data.user ? (data.user as any).token : undefined))) as string | undefined;
     const token = typeof possibleToken === 'string' && possibleToken.length > 0 ? possibleToken : '';
-    const userPayload = (data.user ?? {}) as Partial<User>;
 
     const userData: User = {
-      id: String((userPayload as any).id ?? data.id ?? credentials.username ?? 'instructor'),
+      id,
       tipo: 'instructor',
-      nombre: String((userPayload as any).nombre ?? data.nombre ?? credentials.username ?? 'Instructor'),
-      email: String((userPayload as any).email ?? data.email ?? ''),
-      username: credentials.username,
+      nombre: nombreCompleto,
+      email: '',
+      username: usuario,
       token,
     } as User;
 
