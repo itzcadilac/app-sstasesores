@@ -19,8 +19,8 @@ export default function InstructorDashboard() {
 
   const statsQuery = useQuery({
     queryKey: ['instructor','stats', user?.id, token],
-    queryFn: () => instructorService.getStats(token),
-    enabled: !!token,
+    queryFn: () => instructorService.getStats(token, user?.id),
+    enabled: !!token && !!user?.id,
   });
 
   const reportsQuery = useQuery({

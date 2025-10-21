@@ -24,9 +24,10 @@ export interface InstructorReportItem {
   anioId?: string; // idanio
 }
 
-export async function getStats(token: string): Promise<InstructorStats> {
-  const url = `${API_BASE_URL}/instructor/stats`;
-  const res = await fetch(url, {
+export async function getStats(token: string, idcapacitador?: string): Promise<InstructorStats> {
+  const urlObj = new URL(`${API_BASE_URL}/instructor/stats`);
+  if (idcapacitador) urlObj.searchParams.set('idcapacitador', String(idcapacitador));
+  const res = await fetch(urlObj.toString(), {
     headers: {
       'Authorization': `Bearer ${token}`,
       'x-auth-token': token,
@@ -37,11 +38,14 @@ export async function getStats(token: string): Promise<InstructorStats> {
     throw new Error(text || 'No se pudieron cargar las estadísticas');
   }
   try {
-    const data = JSON.parse(text) as Partial<InstructorStats>;
+    const data = JSON.parse(text) as any;
+    const cursosPendientesCount = Number(data?.cursosPendientesCount ?? data?.pendientes ?? 0) || 0;
+    const cursosCerradosCount = Number(data?.cursosCerradosCount ?? data?.capacitaciones ?? 0) || 0;
+    const capacitadosCount = Number(data?.capacitadosCount ?? data?.capacitados ?? 0) || 0;
     return {
-      capacitaciones: Number((data.capacitaciones ?? 0)) || 0,
-      capacitados: Number((data.capacitados ?? 0)) || 0,
-      pendientes: Number((data.pendientes ?? 0)) || 0,
+      capacitaciones: cursosCerradosCount,
+      capacitados: capacitadosCount,
+      pendientes: cursosPendientesCount,
     };
   } catch {
     return { capacitaciones: 0, capacitados: 0, pendientes: 0 };
