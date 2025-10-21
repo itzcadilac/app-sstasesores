@@ -48,8 +48,7 @@ export async function getStats(token: string): Promise<InstructorStats> {
 }
 
 export async function getRecentReports(params: { limit?: number }, token: string): Promise<InstructorReportItem[]> {
-  const search = new URLSearchParams({ limit: String(params.limit ?? 5) });
-  const url = `${API_BASE_URL}/instructor/reports?${search.toString()}`;
+  const url = `${API_BASE_URL}/listar-solicitudes-instructores`;
   const res = await fetch(url, {
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -58,25 +57,39 @@ export async function getRecentReports(params: { limit?: number }, token: string
   });
   const text = await res.text();
   if (!res.ok) {
-    throw new Error(text || 'No se pudieron cargar los informes');
+    throw new Error(text || 'No se pudieron cargar las solicitudes');
   }
   try {
     const arr = JSON.parse(text) as any[];
-    return (arr || []).slice(0, params.limit ?? 5).map((it) => ({
-      id: String(it.id ?? it.reportId ?? it.codigo ?? Math.random().toString(36).slice(2)),
-      titulo: String(it.titulo ?? it.title ?? it.nombre ?? 'Informe'),
-      curso: String(it.curso ?? it.course ?? it.capacitacion ?? 'Curso'),
-      fecha: String(it.fecha ?? it.createdAt ?? it.fecha_emision ?? ''),
-      url: typeof it.url === 'string' ? it.url : undefined,
-      anio: typeof it.anio === 'string' ? it.anio : (it.year ? String(it.year) : undefined),
-      documento: typeof it.documento === 'string' ? it.documento : (it.document ? String(it.document) : undefined),
-      asunto: typeof it.asunto === 'string' ? it.asunto : (it.subject ? String(it.subject) : undefined),
-      remitente: typeof it.remitente === 'string' ? it.remitente : (it.sender ? String(it.sender) : undefined),
-      instructor: typeof it.instructor === 'string' ? it.instructor : (it.instructorNombre ? String(it.instructorNombre) : undefined),
-      correoSolicitud: typeof it.correoSolicitud === 'string' ? it.correoSolicitud : (it.correo || it.email ? String(it.correo || it.email) : undefined),
-      empresa: typeof it.empresa === 'string' ? it.empresa : (it.company ? String(it.company) : undefined),
-    }));
-  } catch {
+    return (arr || [])
+      .slice(0, params.limit ?? 50)
+      .map((it) => {
+        const id = it.idanio ?? it.id ?? it.codigo ?? null;
+        const titulo = it.titulodoc ?? it.titulo ?? 'Informe';
+        const curso = it.temariodad ?? it.curso ?? 'Curso';
+        const fecha = it.fecha ?? it.fecharesultados ?? '';
+        const documento = it.iddocumento_cuerpo ?? it.documento ?? undefined;
+        const asunto = it.asuntodad ?? it.asunto ?? undefined;
+        const remitente = it.remitente ?? undefined;
+        const instructor = it.instructor ?? undefined;
+        const correoSolicitud = it.correosolicitud ?? undefined;
+        const empresa = it.razonsoc ?? undefined;
+        const anio = it.nombanio ? String(it.nombanio) : undefined;
+        return {
+          id: String(id ?? Math.random().toString(36).slice(2)),
+          titulo: String(titulo),
+          curso: String(curso),
+          fecha: String(fecha),
+          documento: typeof documento === 'string' ? documento : undefined,
+          asunto: typeof asunto === 'string' ? asunto : undefined,
+          remitente: typeof remitente === 'string' ? remitente : undefined,
+          instructor: typeof instructor === 'string' ? instructor : undefined,
+          correoSolicitud: typeof correoSolicitud === 'string' ? correoSolicitud : undefined,
+          empresa: typeof empresa === 'string' ? empresa : undefined,
+          anio,
+        } as InstructorReportItem;
+      });
+  } catch (e) {
     return [];
   }
 }
