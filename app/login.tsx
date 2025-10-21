@@ -114,6 +114,9 @@ export default function LoginScreen() {
                 setLoginType('empresa');
                 clearError();
               }}
+              accessibilityRole="button"
+              accessibilityLabel="Seleccionar Empresa"
+              testID="tab-empresa"
             >
               <Building2
                 size={20}
@@ -124,6 +127,10 @@ export default function LoginScreen() {
                   styles.tabText,
                   loginType === 'empresa' && styles.tabTextActive,
                 ]}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+                allowFontScaling={false}
+                testID="tab-empresa-label"
               >
                 Empresa
               </Text>
@@ -135,6 +142,9 @@ export default function LoginScreen() {
                 setLoginType('personal');
                 clearError();
               }}
+              accessibilityRole="button"
+              accessibilityLabel="Seleccionar Capacitados"
+              testID="tab-personal"
             >
               <User
                 size={20}
@@ -145,6 +155,10 @@ export default function LoginScreen() {
                   styles.tabText,
                   loginType === 'personal' && styles.tabTextActive,
                 ]}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+                allowFontScaling={false}
+                testID="tab-personal-label"
               >
                 Capacitados
               </Text>
@@ -156,6 +170,9 @@ export default function LoginScreen() {
                 setLoginType('instructor');
                 clearError();
               }}
+              accessibilityRole="button"
+              accessibilityLabel="Seleccionar Instructores"
+              testID="tab-instructor"
             >
               <GraduationCap
                 size={20}
@@ -166,6 +183,10 @@ export default function LoginScreen() {
                   styles.tabText,
                   loginType === 'instructor' && styles.tabTextActive,
                 ]}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+                allowFontScaling={false}
+                testID="tab-instructor-label"
               >
                 Instructores
               </Text>
@@ -331,6 +352,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
+    alignItems: 'stretch',
   },
   tab: {
     flex: 1,
@@ -338,17 +360,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 12,
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
     borderRadius: 8,
-    gap: 8,
+    gap: 6,
+    minHeight: 48,
   },
   tabActive: {
     backgroundColor: Colors.primaryLight + '20',
   },
   tabText: {
-    fontSize: 16,
+    fontSize: Platform.OS === 'android' ? 14 : 16,
+    lineHeight: Platform.OS === 'android' ? 18 : 20,
     fontWeight: fontWeight600,
     color: Colors.textSecondary,
+    includeFontPadding: false,
+    textAlignVertical: 'center',
   },
   tabTextActive: {
     color: Colors.primary,
