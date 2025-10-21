@@ -13,8 +13,8 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useRouter } from 'expo-router';
-import { Building2, User, FileText, Lock, AlertCircle, GraduationCap } from 'lucide-react-native';
+import { Link, useRouter } from 'expo-router';
+import { Building2, User, FileText, Lock, AlertCircle, GraduationCap, Shield } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import Colors from '@/constants/Colors';
 
@@ -274,10 +274,23 @@ export default function LoginScreen() {
               </>
             )}
 
+            <View style={styles.legalContainer} accessibilityLabel="Términos y privacidad" testID="legal-links">
+              <Shield size={16} color={Colors.textSecondary} />
+              <Text style={styles.legalText}>Al continuar aceptas nuestros </Text>
+              <Link href="/terminos" testID="link-terminos" accessibilityRole="link">
+                <Text style={styles.legalLink}>Términos</Text>
+              </Link>
+              <Text style={styles.legalText}> y </Text>
+              <Link href="/privacidad" testID="link-privacidad" accessibilityRole="link">
+                <Text style={styles.legalLink}>Privacidad</Text>
+              </Link>
+            </View>
+
             <TouchableOpacity
               style={[styles.button, isLoading && styles.buttonDisabled]}
               onPress={handleSubmit}
               disabled={isLoading}
+              testID="login-button"
             >
               {isLoading ? (
                 <ActivityIndicator color="#FFFFFF" />
@@ -471,5 +484,22 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     textAlign: 'center',
     marginTop: 8,
+  },
+  legalContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 6,
+    justifyContent: 'center',
+    marginTop: 4,
+  },
+  legalText: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+  },
+  legalLink: {
+    fontSize: 12,
+    color: Colors.primary,
+    textDecorationLine: 'underline',
   },
 });
