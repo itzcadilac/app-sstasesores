@@ -5,7 +5,7 @@ import Colors from '@/constants/Colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import * as instructorService from '@/services/instructorService';
-import { Clock, Book } from 'lucide-react-native';
+import { Clock, Book, MapPin } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const fontWeight700 = '700' as const;
@@ -26,7 +26,7 @@ export default function CursosPendientesScreen() {
   const renderItem = ({ item }: { item: instructorService.CursoPendiente }) => (
     <View style={styles.card} testID={`curso-${item.idecalendcapacitaciones}`}>
       <View style={styles.cardHeader}>
-        <Book size={20} color={Colors.primary} />
+        <Book size={20} color='#fff' />
         <Text style={styles.cardTitle} numberOfLines={2}>
           {item.desccapacitacion}
         </Text>
@@ -36,23 +36,16 @@ export default function CursosPendientesScreen() {
         <View style={styles.infoRow}>
           <Clock size={16} color={Colors.textSecondary} />
           <Text style={styles.infoText}>
-            <Text style={styles.infoLabel}>Hora: </Text>
+            <Text style={styles.infoLabel}>Horario: </Text>
             {item.hora}
           </Text>
         </View>
         
         <View style={styles.infoRow}>
-          <View style={[styles.badge, { backgroundColor: Colors.primary + '20' }]}>
-            <Text style={[styles.badgeText, { color: Colors.primary }]}>
-              {item.modalidad}
-            </Text>
-          </View>
-        </View>
-        
-        <View style={styles.infoRow}>
-          <Text style={styles.infoTextSmall}>
-            <Text style={styles.infoLabel}>ID: </Text>
-            {item.idecalendcapacitaciones}
+          <MapPin size={16} color={Colors.textSecondary} />
+          <Text style={styles.infoText}>
+            <Text style={styles.infoLabel}>Modalidad: </Text>
+            {item.modalidad}
           </Text>
         </View>
       </View>
@@ -63,7 +56,7 @@ export default function CursosPendientesScreen() {
     <>
       <Stack.Screen 
         options={{
-          title: 'Cursos Pendientes',
+          title: 'Capacitaciones Pendientes',
           headerStyle: { backgroundColor: Colors.primaryDark },
           headerTintColor: '#fff',
         }} 
@@ -72,14 +65,14 @@ export default function CursosPendientesScreen() {
         {cursosQuery.isLoading && (
           <View style={styles.centerContainer}>
             <ActivityIndicator size="large" color={Colors.primary} />
-            <Text style={styles.loadingText}>Cargando cursos pendientes...</Text>
+            <Text style={styles.loadingText}>Cargando capacitaciones pendientes...</Text>
           </View>
         )}
 
         {cursosQuery.isError && (
           <View style={styles.centerContainer}>
             <Text style={styles.errorText}>
-              Error al cargar los cursos: {cursosQuery.error?.message}
+              Error al cargar las capacitaciones: {cursosQuery.error?.message}
             </Text>
           </View>
         )}
@@ -95,7 +88,7 @@ export default function CursosPendientesScreen() {
             ]}
             ListEmptyComponent={
               <View style={styles.centerContainer}>
-                <Text style={styles.emptyText}>No hay cursos pendientes</Text>
+                <Text style={styles.emptyText}>No hay capacitaciones pendientes</Text>
               </View>
             }
             testID="cursos-list"
@@ -150,7 +143,7 @@ const styles = StyleSheet.create({
   },
   cardHeader: {
     backgroundColor: '#DC2626',
-    paddingVertical: 12,
+    paddingVertical: 14,
     paddingHorizontal: 16,
     flexDirection: 'row',
     alignItems: 'center',
@@ -159,7 +152,7 @@ const styles = StyleSheet.create({
   cardTitle: {
     flex: 1,
     fontSize: 15,
-    fontWeight: fontWeight600,
+    fontWeight: fontWeight700,
     color: '#fff',
   },
   cardBody: {
