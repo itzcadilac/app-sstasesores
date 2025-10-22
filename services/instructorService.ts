@@ -1,5 +1,3 @@
-import { Platform } from 'react-native';
-
 const API_BASE_URL = 'https://software.sstasesores.pe/api';
 
 export interface InstructorStats {
@@ -20,6 +18,13 @@ export interface InstructorReportItem {
   empresa?: string;
   documentoId?: string;
   anioId?: string;
+}
+
+export interface CursoPendiente {
+  idecalendcapacitaciones: string;
+  hora: string;
+  desccapacitacion: string;
+  modalidad: string;
 }
 
 export async function getStats(token: string, idcapacitador?: string): Promise<InstructorStats> {
@@ -119,4 +124,30 @@ export async function fetchReportPdf(documentoId: string, anioId: string, token:
   }
   const blob = await res.blob();
   return blob;
+}
+
+export async function getCursosPendientes(idInstructor: string, token: string): Promise<CursoPendiente[]> {
+  const url = `${API_BASE_URL}/listar-cursos-pendientes-instructor?id=${idInstructor}`;
+  const res = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'x-auth-token': token,
+    },
+  });
+  const text = await res.text();
+  if (!res.ok) {
+    throw new Error(text || 'No se pudieron cargar los cursos pendientes');
+  }
+  try {
+    const data = JSON.parse(text) as any;
+    const out = data?.$out || [];
+    return (out as any[]).map((item) => ({
+      idecalendcapacitaciones: String(item.idecalendcapacitaciones ?? ''),
+      hora: String(item.hora ?? ''),
+      desccapacitacion: String(item.desccapacitacion ?? ''),
+      modalidad: String(item.modalidad ?? ''),
+    }));
+  } catch {
+    return [];
+  }
 }

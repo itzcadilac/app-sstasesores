@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Platform } from 'react-native';
+import { useRouter } from 'expo-router';
 import Colors from '@/constants/Colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQuery } from '@tanstack/react-query';
@@ -15,6 +16,7 @@ export default function InstructorDashboard() {
   const { user } = useAuth();
   const token = user?.token ?? '';
   const insets = useSafeAreaInsets();
+  const router = useRouter();
 
   const statsQuery = useQuery({
     queryKey: ['instructor','stats', user?.id, token],
@@ -55,7 +57,7 @@ export default function InstructorDashboard() {
       title: 'Cursos pendientes',
       value: statsQuery.data?.pendientes ?? 0,
       icon: ClipboardList,
-      color: Colors.warning,
+      color: '#DC2626',
     },
   ]), [statsQuery.data]);
 
@@ -87,15 +89,24 @@ export default function InstructorDashboard() {
       <Text style={styles.greeting} testID="greeting-text">Hola, {user?.nombre ?? 'Instructor'}</Text>
 
       <View style={styles.cardsRow}>
-        {cards.map(({ key, title, value, icon: Icon, color }) => (
-          <View key={key} style={[styles.card, { borderColor: color }]} testID={`card-${key}`}>
-            <View style={[styles.iconWrap, { backgroundColor: color + '20' }]}>
-              <Icon size={22} color={color} />
-            </View>
-            <Text style={styles.cardValue}>{value}</Text>
-            <Text style={styles.cardTitle}>{title}</Text>
-          </View>
-        ))}
+        {cards.map(({ key, title, value, icon: Icon, color }) => {
+          const isPendientes = key === 'pendientes';
+          const CardWrapper = isPendientes ? TouchableOpacity : View;
+          return (
+            <CardWrapper 
+              key={key} 
+              style={[styles.card, { borderColor: color }]} 
+              testID={`card-${key}`}
+              {...(isPendientes ? { onPress: () => router.push('/instructor/cursos-pendientes') } : {})}
+            >
+              <View style={[styles.iconWrap, { backgroundColor: color + '20' }]}>
+                <Icon size={22} color={color} />
+              </View>
+              <Text style={styles.cardValue}>{value}</Text>
+              <Text style={styles.cardTitle}>{title}</Text>
+            </CardWrapper>
+          );
+        })}
       </View>
 
       <View style={styles.sectionHeader}>
