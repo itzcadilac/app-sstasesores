@@ -96,15 +96,17 @@ export default function LoginScreen() {
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.header}>
-            <Image
-              source={{ uri: 'https://sstasesores.pe/logos/logo_sst.webp' }}
-              style={styles.logoImage}
-              resizeMode="contain"
-              accessibilityLabel="Logo SST Asesores"
-              testID="company-logo"
-            />
-            <Text style={styles.title}>SST Asesores</Text>
-            <Text style={styles.subtitle}>Sistema de Capacitaciones</Text>
+            <View style={styles.logoContainer}>
+              <Image
+                source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/fd9ni4xsitakxudbxe89r' }}
+                style={styles.logoImage}
+                resizeMode="contain"
+                accessibilityLabel="Logo TrainingSoft"
+                testID="company-logo"
+              />
+            </View>
+            <Text style={styles.title}>TrainingSoft</Text>
+            <Text style={styles.subtitle}>Sistema de Gestión de Capacitaciones</Text>
           </View>
 
           <View
@@ -321,40 +323,46 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    padding: 24,
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    paddingBottom: 24,
   },
   header: {
     alignItems: 'center',
-    marginTop: 40,
-    marginBottom: 40,
+    marginTop: 20,
+    marginBottom: 36,
   },
   logoContainer: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
+    width: 100,
+    height: 100,
+    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 16,
-    shadowColor: Colors.shadow,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
+    marginBottom: 20,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 16,
     elevation: 8,
+    borderWidth: 1,
+    borderColor: Colors.border + '40',
   },
   logoImage: {
-    width: 180,
-    height: 120,
-    marginBottom: 16,
+    width: 70,
+    height: 70,
   },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: fontWeight,
     color: Colors.text,
-    marginBottom: 8,
+    marginBottom: 6,
+    letterSpacing: -0.5,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 15,
     color: Colors.textSecondary,
+    textAlign: 'center',
   },
   optionGroup: {
     gap: 10,
@@ -364,20 +372,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Colors.surface,
-    borderRadius: 12,
-    paddingVertical: 14,
-    paddingHorizontal: 14,
-    borderWidth: 1,
+    borderRadius: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    borderWidth: 2,
     borderColor: Colors.border,
     shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
-    shadowRadius: 4,
+    shadowRadius: 8,
     elevation: 2,
   },
   optionSelected: {
     borderColor: Colors.primary,
-    backgroundColor: Colors.primaryLight + '15',
+    backgroundColor: Colors.primaryLight + '20',
+    shadowColor: Colors.primary,
+    shadowOpacity: 0.15,
+    elevation: 4,
   },
   optionLeft: {
     flexDirection: 'row',
@@ -440,14 +451,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Colors.surface,
-    borderRadius: 12,
+    borderRadius: 14,
     paddingHorizontal: 16,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: Colors.border,
     shadowColor: Colors.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
     elevation: 1,
   },
   inputIcon: {
@@ -461,15 +472,15 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: Colors.primary,
-    paddingVertical: 16,
-    borderRadius: 12,
+    paddingVertical: 18,
+    borderRadius: 14,
     alignItems: 'center',
     marginTop: 8,
     shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    elevation: 6,
   },
   buttonDisabled: {
     opacity: 0.6,
