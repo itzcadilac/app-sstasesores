@@ -140,7 +140,7 @@ export async function getCursosPendientes(idInstructor: string, token: string): 
   }
   try {
     const data = JSON.parse(text) as any;
-    const out = data?.$out || [];
+    const out = Array.isArray(data) ? data : (data?.$out || []);
     return (out as any[]).map((item) => ({
       idecalendcapacitaciones: String(item.idecalendcapacitaciones ?? ''),
       hora: String(item.hora ?? ''),
