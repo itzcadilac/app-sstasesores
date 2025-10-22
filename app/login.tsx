@@ -98,7 +98,7 @@ export default function LoginScreen() {
           <View style={styles.header}>
             <View style={styles.logoContainer}>
               <Image
-                source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/og390uhca18bok51jhzqz' }}
+                source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/azogb6gfua610zk671xpe' }}
                 style={styles.logoImage}
                 resizeMode="contain"
                 accessibilityLabel="Logo TrainingSoft"
