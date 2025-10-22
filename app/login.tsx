@@ -333,15 +333,15 @@ const styles = StyleSheet.create({
     marginBottom: 36,
   },
   logoContainer: {
-    width: 100,
-    height: 100,
+    width: 140,
+    height: 140,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 20,
+    marginBottom: 16,
   },
   logoImage: {
-    width: 70,
-    height: 70,
+    width: 140,
+    height: 140,
   },
   title: {
     fontSize: 32,
