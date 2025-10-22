@@ -98,7 +98,7 @@ export default function LoginScreen() {
           <View style={styles.header}>
             <View style={styles.logoContainer}>
               <Image
-                source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/azogb6gfua610zk671xpe' }}
+                source={{ uri: 'https://sstasesores.pe/wp-content/uploads/2024/06/logo_sst.webp' }}
                 style={styles.logoImage}
                 resizeMode="contain"
                 accessibilityLabel="Logo TrainingSoft"
