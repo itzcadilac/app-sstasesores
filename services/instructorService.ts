@@ -25,6 +25,10 @@ export interface CursoPendiente {
   hora: string;
   desccapacitacion: string;
   modalidad: string;
+  asistenciascerradas: number;
+  notascerradas: number;
+  fotos_cargadas: number;
+  cursoliberado: number;
 }
 
 export async function getStats(token: string, idcapacitador?: string): Promise<InstructorStats> {
@@ -146,6 +150,10 @@ export async function getCursosPendientes(idInstructor: string, token: string): 
       hora: String(item.hora ?? ''),
       desccapacitacion: String(item.desccapacitacion ?? ''),
       modalidad: String(item.modalidad ?? ''),
+      asistenciascerradas: Number(item.asistenciascerradas ?? item.asistencias_cerradas ?? 0) || 0,
+      notascerradas: Number(item.notascerradas ?? item.notas_cerradas ?? 0) || 0,
+      fotos_cargadas: Number(item.fotos_cargadas ?? item.fotoscargadas ?? 0) || 0,
+      cursoliberado: Number(item.cursoliberado ?? item.curso_liberado ?? 0) || 0,
     }));
   } catch {
     return [];

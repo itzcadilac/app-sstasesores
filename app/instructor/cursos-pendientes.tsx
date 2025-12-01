@@ -5,11 +5,30 @@ import Colors from '@/constants/Colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import * as instructorService from '@/services/instructorService';
-import { Clock, Book, MapPin } from 'lucide-react-native';
+import { Clock, Book, MapPin, ClipboardCheck, PencilLine, FileText, Unlock } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const fontWeight700 = '700' as const;
 const fontWeight600 = '600' as const;
+const pendingAccent = '#C81E1E';
+const pendingTint = '#FFF4F4';
+const pendingChipBg = '#FFE7E2';
+
+type PendingField = 'asistenciascerradas' | 'notascerradas' | 'fotos_cargadas' | 'cursoliberado';
+
+type PendingIndicator = {
+  key: PendingField;
+  label: string;
+  field: PendingField;
+  Icon: typeof ClipboardCheck;
+};
+
+const pendingIndicators: PendingIndicator[] = [
+  { key: 'asistenciascerradas', label: 'Cerrar asistencia', field: 'asistenciascerradas', Icon: ClipboardCheck },
+  { key: 'notascerradas', label: 'Cerrar notas', field: 'notascerradas', Icon: PencilLine },
+  { key: 'fotos_cargadas', label: 'Crear informes', field: 'fotos_cargadas', Icon: FileText },
+  { key: 'cursoliberado', label: 'Liberación de curso', field: 'cursoliberado', Icon: Unlock },
+];
 
 export default function CursosPendientesScreen() {
   const { user } = useAuth();
@@ -23,43 +42,69 @@ export default function CursosPendientesScreen() {
     enabled: !!token && !!idInstructor,
   });
 
-  const renderItem = ({ item }: { item: instructorService.CursoPendiente }) => (
-    <View style={styles.card} testID={`curso-${item.idecalendcapacitaciones}`}>
-      <View style={styles.cardHeader}>
-        <Book size={20} color='#fff' />
-        <Text style={styles.cardTitle} numberOfLines={2}>
+  const renderItem = ({ item }: { item: instructorService.CursoPendiente }) => {
+    const [fecha, horaExacta] = (item.hora ?? '').split(' ');
+    const pendingBadges = pendingIndicators.filter(({ field }) => item[field] === 0);
+
+    return (
+      <View style={styles.card} testID={`curso-${item.idecalendcapacitaciones}`}>
+        <View style={styles.cardHeader}>
+          <View style={styles.statusPill}>
+            <View style={styles.statusDot} />
+            <Text style={styles.statusText}>Curso pendiente</Text>
+          </View>
+          <View style={styles.headerIconWrap}>
+            <Book size={20} color={pendingAccent} />
+          </View>
+        </View>
+
+        <Text style={styles.cardTitle} numberOfLines={3}>
           {item.desccapacitacion}
         </Text>
-      </View>
-      
-      <View style={styles.cardBody}>
-        <View style={styles.infoRow}>
-          <Clock size={16} color={Colors.textSecondary} />
-          <Text style={styles.infoText}>
-            <Text style={styles.infoLabel}>Horario: </Text>
-            {item.hora}
-          </Text>
+
+        <View style={styles.divider} />
+
+        <View style={styles.cardBody}>
+          <View style={styles.infoRow}>
+            <Clock size={16} color={Colors.textSecondary} />
+            <Text style={styles.infoText}>
+              <Text style={styles.infoLabel}>Horario: </Text>
+              {fecha}
+              {horaExacta ? ` · ${horaExacta}` : ''}
+            </Text>
+          </View>
+
+          <View style={styles.infoRow}>
+            <MapPin size={16} color={Colors.textSecondary} />
+            <Text style={styles.infoText}>
+              <Text style={styles.infoLabel}>Modalidad: </Text>
+              {item.modalidad}
+            </Text>
+          </View>
         </View>
-        
-        <View style={styles.infoRow}>
-          <MapPin size={16} color={Colors.textSecondary} />
-          <Text style={styles.infoText}>
-            <Text style={styles.infoLabel}>Modalidad: </Text>
-            {item.modalidad}
-          </Text>
-        </View>
+
+        {pendingBadges.length > 0 && (
+          <View style={styles.pendingRow} testID={`pendientes-${item.idecalendcapacitaciones}`}>
+            {pendingBadges.map(({ key, label, Icon }) => (
+              <View key={key} style={styles.pendingBadge} testID={`pendiente-${item.idecalendcapacitaciones}-${key}`}>
+                <Icon size={16} color={pendingAccent} />
+                <Text style={styles.pendingBadgeText}>{label}</Text>
+              </View>
+            ))}
+          </View>
+        )}
       </View>
-    </View>
-  );
+    );
+  };
 
   return (
     <>
-      <Stack.Screen 
+      <Stack.Screen
         options={{
           title: 'Capacitaciones Pendientes',
           headerStyle: { backgroundColor: Colors.primaryDark },
           headerTintColor: '#fff',
-        }} 
+        }}
       />
       <View style={styles.container}>
         {cursosQuery.isLoading && (
@@ -127,36 +172,63 @@ const styles = StyleSheet.create({
   },
   listContent: {
     padding: 16,
-    gap: 12,
+    gap: 16,
   },
   card: {
     backgroundColor: Colors.surface,
-    borderRadius: 12,
+    borderRadius: 20,
+    padding: 18,
     borderWidth: 1,
-    borderColor: Colors.border,
-    overflow: 'hidden',
+    borderColor: '#FFD4D7',
     shadowColor: Colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 3,
+    gap: 12,
   },
   cardHeader: {
-    backgroundColor: '#DC2626',
-    paddingVertical: 14,
-    paddingHorizontal: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  statusPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    backgroundColor: pendingTint,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 999,
+  },
+  statusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: pendingAccent,
+    marginRight: 6,
+  },
+  statusText: {
+    fontSize: 12,
+    fontWeight: fontWeight600,
+    color: pendingAccent,
+    textTransform: 'uppercase',
+  },
+  headerIconWrap: {
+    backgroundColor: pendingTint,
+    padding: 10,
+    borderRadius: 12,
   },
   cardTitle: {
-    flex: 1,
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: fontWeight700,
-    color: '#fff',
+    color: Colors.text,
+    lineHeight: 22,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#FFE1E3',
   },
   cardBody: {
-    padding: 16,
     gap: 10,
   },
   infoRow: {
@@ -169,21 +241,27 @@ const styles = StyleSheet.create({
     color: Colors.text,
     flex: 1,
   },
-  infoTextSmall: {
-    fontSize: 12,
-    color: Colors.textSecondary,
-  },
   infoLabel: {
     fontWeight: fontWeight700,
   },
-  badge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 6,
+  pendingRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 4,
   },
-  badgeText: {
+  pendingBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: pendingChipBg,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 999,
+  },
+  pendingBadgeText: {
+    marginLeft: 8,
     fontSize: 12,
+    color: pendingAccent,
     fontWeight: fontWeight600,
-    textTransform: 'uppercase',
   },
 });
