@@ -1,4 +1,4 @@
-import { SolicitudCapacitacion, Capacitado, Capacitacion, CapacitacionDetalle } from '@/types';
+import { SolicitudCapacitacion, Capacitacion, CapacitacionDetalle } from '@/types';
 
 const API_BASE_URL = 'https://software.sstasesores.pe/api';
 

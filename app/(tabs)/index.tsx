@@ -5,7 +5,7 @@ import { Building2, User, FileText, TrendingUp, Search } from 'lucide-react-nati
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import Colors from '@/constants/Colors';
-import { obtenerEstadisticasEmpresa, consultarCapacitacionesPorDocumento, obtenerEstadisticasPersonal } from '@/services/capacitacionService';
+import { obtenerEstadisticasEmpresa, obtenerEstadisticasPersonal } from '@/services/capacitacionService';
 
 const fontWeight700 = '700' as const;
 const fontWeight600 = '600' as const;
@@ -16,7 +16,7 @@ interface EstadisticasEmpresa {
 }
 
 export default function HomeScreen() {
-  const { user, isEmpresa, isPersonal, isInstructor } = useAuth();
+  const { user, isEmpresa, isPersonal } = useAuth();
   const router = useRouter();
   const [estadisticas, setEstadisticas] = useState<EstadisticasEmpresa>({ cantidadSolicitudes: 0, capacitados: 0 });
   const [isLoadingStats, setIsLoadingStats] = useState(false);

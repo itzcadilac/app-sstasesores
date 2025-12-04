@@ -13,6 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { FileText, Calendar, Users, Clock, MapPin, Phone, Mail, MessageSquare } from 'lucide-react-native';
 import Colors from '@/constants/Colors';
 import { SolicitudCapacitacion } from '@/types';
+import { crearSolicitud } from '@/services/capacitacionService';
 
 const fontWeight700 = '700' as const;
 const fontWeight600 = '600' as const;
@@ -72,11 +73,22 @@ export default function SolicitudScreen() {
       return;
     }
 
+    if (!user?.token) {
+      Alert.alert('Sesión requerida', 'Inicia sesión nuevamente para enviar la solicitud.');
+      return;
+    }
+
+    const participantes = parseInt(numeroParticipantes, 10);
+    if (Number.isNaN(participantes) || participantes <= 0) {
+      Alert.alert('Dato inválido', 'Ingrese un número de participantes válido.');
+      return;
+    }
+
     const solicitud: SolicitudCapacitacion = {
       empresaId: user?.id || '',
       tipoCapacitacion,
       modalidad,
-      numeroParticipantes: parseInt(numeroParticipantes),
+      numeroParticipantes: participantes,
       fechaSolicitada,
       horarioPreferido,
       area,
@@ -86,13 +98,12 @@ export default function SolicitudScreen() {
       observaciones,
     };
 
+    console.log('[Solicitud] Enviando payload', solicitud);
     setIsSubmitting(true);
 
     try {
-      
-
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
+      await crearSolicitud(solicitud, user.token);
+      console.log('[Solicitud] Payload enviado correctamente');
       Alert.alert(
         'Éxito',
         'Solicitud enviada correctamente. Nos pondremos en contacto pronto.',
@@ -110,12 +121,15 @@ export default function SolicitudScreen() {
               setContactoTelefono('');
               setContactoEmail('');
               setObservaciones('');
+              setCuposDisponibles(null);
             },
           },
         ]
       );
-    } catch {
-      Alert.alert('Error', 'No se pudo enviar la solicitud. Intente nuevamente.');
+    } catch (error) {
+      console.log('[Solicitud] Error al enviar', error);
+      const errorMessage = error instanceof Error ? error.message : 'No se pudo enviar la solicitud. Intente nuevamente.';
+      Alert.alert('Error', errorMessage);
     } finally {
       setIsSubmitting(false);
     }

@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, TextInput, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, TextInput, ActivityIndicator } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { User, Building2, Mail, FileText, Phone, Lock } from 'lucide-react-native';
 import Colors from '@/constants/Colors';
@@ -48,7 +48,7 @@ export default function PerfilScreen() {
     } finally {
       setChanging(false);
     }
-  }, [user?.token, canSubmit, currentPassword, newPassword, user?.id, user?.ruc, confirmPassword]);
+  }, [user?.token, canSubmit, currentPassword, newPassword, user?.id, user?.ruc]);
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
