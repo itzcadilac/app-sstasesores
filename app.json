@@ -15,14 +15,14 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "app.rork.app-capacitaciones-sst"
+      "bundleIdentifier": "app.sstasesores.app-capacitaciones-sst"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "app.rork.app-capacitaciones-sst"
+      "package": "app.sstasesores.app-capacitaciones-sst"
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
