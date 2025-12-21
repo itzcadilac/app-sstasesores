@@ -1,0 +1,6 @@
+Versión 1.0.0 — Primera publicación
+- Consulta de capacitaciones (fechas, horas, estado, certificados)
+- Solicitud de cursos (presencial/virtual/in-house)
+- Búsqueda por documento/RUC
+- Gestión de perfil
+- Módulo de instructor (cursos pendientes)

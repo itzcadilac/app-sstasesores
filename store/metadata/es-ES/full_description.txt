@@ -1,0 +1,26 @@
+TrainingSoft es la app oficial de SST Asesores para gestionar y consultar capacitaciones en Seguridad y Salud en el Trabajo.
+
+Principales funciones:
+- Consulta tus capacitaciones: fechas, horas, estado y certificados.
+- Solicita nuevos cursos: presencial, virtual o in-house (proximamente)
+- Busca participantes y cursos por documento/RUC.
+- Administra tu perfil y datos de contacto.
+- Módulo de instructor: cursos pendientes y seguimiento.
+
+Beneficios:
+- Acceso rápido a certificados y estado de cursos.
+- Solicitudes de capacitación con seguimiento.
+- Experiencia enfocada en empresas y personal.
+
+Requisitos:
+- Conexión a internet.
+- Cuenta válida (empresa, personal o instructor).
+
+Soporte y contacto:
+- Correo: soporte@sstasesores.pe
+- Sitio web: https://sstasesores.pe
+
+Privacidad:
+- Política de privacidad: https://software.sstasesores.pe/politica-privacidad
+
+Esta app utiliza conexiones seguras (HTTPS).

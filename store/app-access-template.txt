@@ -1,0 +1,32 @@
+App Access — credenciales de prueba para revisión de Google Play
+
+Tipo de acceso: Requiere inicio de sesión
+
+Credenciales de prueba:
+- Empresa
+  - Usuario (RUC): 20600350391
+  - Contraseña: 1234567
+- Instructor
+  - Usuario: 72082330
+  - Contraseña: 1234567
+- Capacitados
+  - Documento (DNI/CE): 72082330
+
+Instrucciones de uso para revisión:
+- Iniciar sesión en la pantalla de Login según el tipo seleccionado.
+- Empresa:
+  - Seleccionar "Empresa".
+  - Ingresar RUC y contraseña.
+  - Navegar a "Consulta de capacitaciones" y verificar estados/certificados.
+  - Ir a "Solicitud" y enviar una solicitud de capacitación (sin datos sensibles).
+- Instructor:
+  - Seleccionar "Instructores".
+  - Ingresar usuario y contraseña.
+  - Revisar "Cursos pendientes".
+- Capacitados:
+  - Seleccionar "Capacitados".
+  - Ingresar documento.
+  - Ver detalle de capacitaciones y certificado.
+
+Contacto para soporte durante la revisión:
+- Correo: soporte@sstasesores.pe
